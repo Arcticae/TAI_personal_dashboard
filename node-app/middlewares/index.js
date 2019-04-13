@@ -1,4 +1,6 @@
 const expressSession = require('./session');
-module.exports = () => {
-    session: expressSession
-}
+const loginRedirect = require('./login_redirect');
+module.exports = (app) => ({
+    session: expressSession(app),
+    loginRedirect: loginRedirect(app)
+});

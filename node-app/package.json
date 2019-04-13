@@ -4,7 +4,11 @@
   "description": "Backend app for pers-dashboard",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev":"NODE_ENV=dev&&nodemon server.js",
+    "prod":"NODE_ENV=prod&& nodejs server.js",
+    "dev_windows": "set NODE_ENV=dev&& nodemon server.js",
+    "prod_windows": "set NODE_ENV=prod&& nodejs server.js"
   },
   "author": "",
   "license": "ISC",
