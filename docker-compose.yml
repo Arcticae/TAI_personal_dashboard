@@ -1,7 +1,9 @@
 version: "2"
 services:
   react-app:
-    image: react-app
+    build:
+      context: ./react-app/
+      dockerfile: Dockerfile
     restart: always
     ports:
       - "3000:3000"
@@ -13,7 +15,9 @@ services:
     networks:
       - webappnetwork
   node-app:
-    image: node-app
+    build:
+      context: ./node-app/
+      dockerfile: Dockerfile
     restart: always
     ports:
       - "6969:6969"
