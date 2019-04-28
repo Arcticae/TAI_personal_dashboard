@@ -2,9 +2,14 @@
   "name": "node-app",
   "version": "1.0.0",
   "description": "Backend app for pers-dashboard",
-  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.16.4",
+    "mongoose": "^5.5.1",
+    "body-parser": "^1.18.3",
+    "express-session": "^1.15.6"
   },
   "author": "",
   "license": "ISC"
