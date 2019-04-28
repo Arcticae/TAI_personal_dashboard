@@ -11,12 +11,12 @@ const app = express();
 const router = express.Router();
 
 //put our middlewares into app object
-var middlewares = require('./middlewares/index.js');
+app.middlewares = require('./middlewares');
 //use cookie session with expiration time
-app.use(middlewares);
+app.use(app.middlewares.session(SESS_TIMEOUT));
 
 app.get('/', (req, res) => {
-    console.log("req");
+    console.log(req);
     res.send('Hai there');
 });
 
