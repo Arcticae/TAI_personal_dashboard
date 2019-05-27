@@ -1,0 +1,44 @@
+version: "2"
+services:
+  react-app:
+    build:
+      context: ./react-app/
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./react-app:/react-app
+      - /client/node_modules
+    links:
+      - node-app
+    networks:
+      - webappnetwork
+  node-app:
+    build:
+      context: ./node-app/
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "6969:6969"
+    volumes:
+      - ./node-app:/node-app
+      - /node-app/node_modules
+    depends_on:
+      - mongodb
+    networks:
+      - webappnetwork
+  mongodb:
+    image: mongo
+    restart: always
+    container_name: mongodb
+    volumes:
+      - ./data-node:/data/db
+    ports:
+      - 27017:27017
+    command: mongod --noauth --smallfiles
+    networks:
+      - webappnetwork
+networks:
+  webappnetwork:
+    driver: bridge
