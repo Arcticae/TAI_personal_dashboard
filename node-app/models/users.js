@@ -1,20 +1,13 @@
 //This is a stub of a model implementation 
-module.exports  = (app) => {
-    const Schema = app.mongoose.Schema;
-    const userSchema = new Schema({
+module.exports = (app) => {
+
+    const userSchema = new app.mongoose.Schema({
         id: Number,
         username: String,
         password: String,
         email: String
     });
-    userSchema.methods.findById = (id) =>{
-        //TODO: IMPLEMENT
-    };
-    userSchema.methods.exists = (id) =>{
-        //TODO: IMPLEMENT
-    }
-    
-    const user = app.mongoose.model('user', userSchema);
-    return user;
-} 
+
+    return app.mongoose.model('user', userSchema);
+};
 

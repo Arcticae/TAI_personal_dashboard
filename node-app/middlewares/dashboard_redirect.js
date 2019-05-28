@@ -4,4 +4,4 @@ module.exports = (app) => ((req, res, next) => {
     } else{
         next();
     }
- }) 
+ });

@@ -5,21 +5,15 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev":"NODE_ENV=dev&&nodemon server.js",
-    "prod":"NODE_ENV=prod&& nodejs server.js",
-    "dev_windows": "set NODE_ENV=dev&& nodemon server.js",
-    "prod_windows": "set NODE_ENV=prod&& nodejs server.js"
-    "start": "node server.js"
+    "start": "NODE_ENV=dev && node server.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "body-parser": "^1.18.3",
     "express": "^4.16.4",
     "mongoose": "^5.5.1",
     "body-parser": "^1.18.3",
+    "connect-mongo": "^2.0.3",
     "express-session": "^1.15.6"
-  },
-  "author": "",
-  "license": "ISC"
+  }
 }

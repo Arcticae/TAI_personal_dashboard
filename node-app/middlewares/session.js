@@ -13,8 +13,7 @@ module.exports = (app) =>
         resave: false,
         saveUninitialized: false,
         secret: 'secret_str',
-        store: new MongoStore({mongooseConnection: app.mongoose})
-        //TODO set store for the cookie (mongodb)
+        store: new MongoStore({mongooseConnection: app.mongoose.connection})
 
     }
     );
