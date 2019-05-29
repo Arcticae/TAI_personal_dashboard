@@ -42,7 +42,7 @@ function start_app() {
             "<a href = '/dashboard'> Dashboard</a>" +
             "<form method = 'post' action = '/logout'>" +
             "<button type='submit'>Log out</button>"
-            +"</form>");
+            + "</form>");
     });
 
     app.get('/dashboard', app.middlewares.loginRedirect, (req, res) => {
@@ -69,78 +69,101 @@ function start_app() {
     });
 
     app.post('/login', app.middlewares.dashboardRedirect, (req, res) => {
-            let username = req.body.username;
+            let email = req.body.email.toLowerCase();
             let password = req.body.password;
 
-            let user = app.model.user.find({$or: [{username: username}, {email: username}]});
-            if (user) {
-                //user exists, check password
-                if (user.password === password) {
-                    req.session.userId = user.id;
-                    res.redirect('/dashboard');
-                } else {
-                    res.send("<h2>Wrong password. Try again?</h2>" +
-                        "<a href ='/register'>Register</a>" +
-                        +"<a href ='/login'>Log in</a>"
-                    )
-                    ;
-                }
-            } else {
-                //TODO: user not found, send info to backend that he doesn't exist
-                res.send("<h2>Client does not exist. Try again?</h2>" +
-                    "<a href ='/register'>Register</a>" +
-                    +"<a href ='/login'>Log in</a>"
-                )
-                ;
-            }
+            app.model.user
+                .find({email: email})
+                .exec((err, users) => {
+                    if (err) {
+                        //TODO: reutrn db error to frontend
+                        console.log("Error in database search: " + err);
+
+                    } else if (users.length) {
+                        //user exists, check password
+                        //todo swap function for findOne to avoid this
+                        let user = users[0];
+                        console.log("User found " + user);
+                        if (user.password === password) {
+                            console.log("Assigning userid %s to session token", user.id);
+                            req.session.userId = user.id;
+                            console.log(req.session);
+                            res.redirect('/dashboard');
+                        } else {
+                            res.send("<h2>Wrong password. Try again?</h2>" +
+                                "<a href ='/register'>Register</a>" +
+                                "<a href ='/login'>Log in</a>"
+                            );
+                        }
+                    } else {
+                        console.log("Query result: " + users);
+                        //TODO: user not found, send info to backend that he doesn't exist
+                        res.send("<h2>Client does not exist. Try again?</h2>" +
+                            "<a href ='/register'>Register</a>" +
+                            "<a href ='/login'>Log in</a>"
+                        );
+                    }
+                });
+
+
         }
     );
 //Post for creating new user
     app.post('/register', app.middlewares.dashboardRedirect, (req, res) => {
         let username = req.body.username;
         let password = req.body.password;
-        let email = req.body.email;
+        let email = req.body.email.toLowerCase();
+        console.log("Got a query to register user %s with password %s and email %s", username, password, email);
+        app.model.user
+            .find({username: username})
+            .exec( async (err, db_user) => {
+                    if (err) {
+                        //TODO: error in search for user in db
+                        console.log("error during searching for user in db: " + err);
+                    } else if (db_user.length) {
+                        //TODO: return info to frontend, that user exists
+                        console.log('User with this name already exists.');
+                        console.log(db_user);
+                        res.send("<h1>Register<h1>" +
+                            "<h2>User with this username already exists. Wanna try again?</h2>" +
+                            "<form method = 'post' action='/register'>" +
+                            "<input type ='text' name = 'username' placeholder='Username' required/>" +
+                            "<input type ='email' name = 'email' placeholder='Email' required/>" +
+                            "<input type ='password' name = 'password' placeholder='Password' required/>" +
+                            "<button type ='submit'>Register</button>" +
+                            "</form> " +
+                            "<a href='/login'>Maybe login?</a>");
 
-        app.model.user.find({username: username}).then((err, db_user) => {
-                if (err) {
-                    //TODO: error in search for user in db
-                    console.log("error during searching for user in db");
-                } else if (db_user.length) {
-                    //TODO: return info to frontend, that user exists
-                    console.log('User with this name already exists.');
-                    console.log(db_user);
-                    res.send("<h1>Register<h1>" +
-                        "<h2>User with this username already exists. Wanna try again?</h2>" +
-                        "<form method = 'post' action='/register'>" +
-                        "<input type ='text' name = 'username' placeholder='Username' required/>" +
-                        "<input type ='email' name = 'email' placeholder='Email' required/>" +
-                        "<input type ='password' name = 'password' placeholder='Password' required/>" +
-                        "<button type ='submit'>Register</button>" +
-                        "</form> ");
+                    } else if (!db_user.length) {
+                        //TODO: move this to another module
+                        let nextUserId = (await app.model.counter.getNextId("userid")).seq;
+                        console.log("Getting next id: %s and assigning it to user %s", nextUserId, username);
+                        let new_user = new app.model.user({
+                            id: nextUserId,
+                            username: username,
+                            //TODO: store the password as MD5 or sth
+                            password: password,
+                            email: email
+                        });
+                        new_user.save((error) => {
+                            //TODO throw error
+                            if (error) {
+                                console.log("There has been an error saving the data to DB, reason: " + error);
+                                res.redirect('/register');
+                            } else {
+                                req.session.userId = new_user.id;
+                                res.redirect('/dashboard');
+                            }
+                        });
 
-                } else if (!db_user.length) {
-                    //TODO: move this to another module
-                    let new_user = new app.model.user({
-                        id: app.model.counter.getNextId("userid"),
-                        username: username,
-                        //TODO: store the password as MD5 or sth
-                        password: password,
-                        email: email
-                    });
-                    new_user.save((error) => {
-                        //TODO throw error
-                        console.log("There has been an error saving the data to DB, reason: " + error.message);
-                        res.redirect('/register');
-                    });
-                    req.session.userId = new_user.id;
-                    req.redirect('/dashboard');
+                    }
                 }
-            }
-        );
+            );
 
     });
     app.post('/logout', app.middlewares.loginRedirect, (req, res) => {
         console.log("Trying to log out");
+
     });
 
     app.listen(config.APP_PORT, () => {
