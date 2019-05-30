@@ -47,13 +47,13 @@ function start_app() {
         let password = req.body.password;
 
         if (!(email && password))
-            res.json({error: true, reason: "Insufficient parameters supplied to request"});
+            return res.json({error: true, reason: "Insufficient parameters supplied to request"});
 
         app.model.user
             .findOne({email: email})
             .exec((err, user) => {
                 if (err) {
-                    res.json({error: true, reason: "Database threw an error while looking for user with that name"});
+                    return res.json({error: true, reason: "Database threw an error while looking for user with that name"});
                 } else if (user) {
                     if (user.password === password) {
                         let token = utils.security.hashToken(16);
@@ -62,16 +62,16 @@ function start_app() {
                         const tokenObject = new app.model.token({value: token, valid_to: validTo});
                         tokenObject.save((error) => {
                             if (error) {
-                                res.json({error: true, reason: "Database threw an error while saving your session"});
+                                return res.json({error: true, reason: "Database threw an error while saving your session"});
                             } else {
-                                res.json({authorized: true, token: token});
+                                return res.json({authorized: true, token: token});
                             }
                         });
                     } else {
-                        res.json({authorized: false, reason: "Wrong password for given user"});
+                        return res.json({authorized: false, reason: "Wrong password for given user"});
                     }
                 } else {
-                    res.json({authorized: false, reason: "User with given credentials does not exist"});
+                    return res.json({authorized: false, reason: "User with given credentials does not exist"});
                 }
             });
     });
@@ -83,16 +83,16 @@ function start_app() {
         let email = req.body.email;
 
         if (!(username && password && email))
-            res.json({error: true, reason: "Insufficient parameters supplied to request"});
+            return res.json({error: true, reason: "Insufficient parameters supplied to request"});
 
         email = email.toLowerCase();
         app.model.user
             .findOne({email: email})
             .exec(async (err, db_user) => {
                     if (err) {
-                        res.json({error: true, reason: "Database threw an error while looking for user with that name"});
+                        return res.json({error: true, reason: "Database threw an error while looking for user with that name"});
                     } else if (db_user) {
-                        res.json({success: false, reason: "User with this e-mail already exists"});
+                        return res.json({success: false, reason: "User with this e-mail already exists"});
                     } else if (!db_user) {
                         //TODO: move creating a user to statics?
                         let nextUserId = (await app.model.counter.getNextId("userid")).seq;
@@ -105,9 +105,9 @@ function start_app() {
                         });
                         new_user.save((error) => {
                             if (error) {
-                                res.json({error: true, reason: "Database threw an error while saving user info"});
+                                return res.json({error: true, reason: "Database threw an error while saving user info"});
                             } else {
-                                res.json({success: true});
+                                return res.json({success: true});
                             }
                         });
                     }
@@ -120,14 +120,14 @@ function start_app() {
     app.post('/logout', app.middlewares.loginRedirect, upload.none(), (req, res) => {
         let token = req.body.token;
         if (!token)
-            res.json({error: true, reason: "Insufficient parameters supplied to request"});
+            return res.json({error: true, reason: "Insufficient parameters supplied to request"});
         app.model.token
             .findOneAndDelete({value: token})
             .exec((error, _) => {
                 if (error)
-                    res.json({error: true, reason: "Token revoke went wrong"});
+                    return res.json({error: true, reason: "Token revoke went wrong"});
                 else
-                    res.redirect("/");
+                    return res.redirect("/");
             });
     });
 
