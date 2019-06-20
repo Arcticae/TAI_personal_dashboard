@@ -37,10 +37,7 @@ app.middlewares = require("./middlewares")(app);
 app.middlewares.upload = multer();
 //Models
 app.model = require("./models")(app);
-//User routes
-app.use("/api/user/", require("./api/user/login")(app));
-app.use("/api/user/", require("./api/user/register")(app));
-app.use("/api/user/", require("./api/user/logout")(app));
+app.use("/api", require("./api")(app));
 
 function start_app() {
   //TODO: move scheduled jobs somewhere?
@@ -48,7 +45,7 @@ function start_app() {
   schedule.scheduleJob(` */${app.config.SESS_TIMEOUT} * * * * `, () => {
     console.log("[INFO] Scheduled revoked tokens removal is in process");
 
-    app.model.token
+    app.model.auth.token
       .deleteMany({
         valid_to: { $lt: new Date(Date.now()) }
       })

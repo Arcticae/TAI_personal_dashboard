@@ -7,7 +7,7 @@ module.exports = app => {
   // @access Public
   // @body <email> <password> <username>
   router.post("/register", app.middlewares.upload.none(), (req, res) => {
-    const User = app.model.user;
+    const User = app.model.auth.user;
 
     let username = req.body.username;
     let password = req.body.password;

@@ -1,7 +1,7 @@
 const isEmpty = require("../utils/").params.isEmpty;
 module.exports = app => (req, res, next) => {
   const token = req.headers.token;
-  const Token = app.model.token;
+  const Token = app.model.auth.token;
 
   if (!isEmpty(token)) {
     Token.findOne({ value: token })

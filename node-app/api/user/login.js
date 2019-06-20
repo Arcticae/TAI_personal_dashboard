@@ -5,8 +5,9 @@ const isEmpty = utils.params.isEmpty;
 const hashToken = utils.security.hashToken;
 
 module.exports = app => {
-  const Token = app.model.token;
-  const User = app.model.user;
+  const Token = app.model.auth.token;
+  const User = app.model.auth.user;
+
   // @path POST /api/user/login
   // @desc Log in the user and retrieve the token
   // @access Public
@@ -71,8 +72,8 @@ module.exports = app => {
   // @headers <token>
   router.get("/", (req, res) => {
     const token = req.headers.token;
-    const User = app.model.user;
-    const Token = app.model.token;
+    const User = app.model.auth.user;
+    const Token = app.model.auth.token;
     if (isEmpty(token)) {
       return res.status(400).json({
         token: "No API token provided in headers"
