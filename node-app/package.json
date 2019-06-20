@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "NODE_ENV=dev && node server.js"
+    "start-dev": "export NODE_ENV=dev && nodemon server.js",
+    "start": "export NODE_ENV=prod && node server.js"
   },
   "author": "",
   "license": "ISC",
