@@ -13,6 +13,27 @@ module.exports = app => {
       required: true
     }
   });
+  userSchema.static("findByToken", token => {
+    app.models.token
+      .findOne({ value: token })
+      .then(dbToken => {
+        if (dbToken) {
+          const userId = dbToken.owner;
+          this.findOne({ _id: userId })
+            .then(user => {
+              return user;
+            })
+            .catch(err => {
+              return null;
+            });
+        } else {
+          return null;
+        }
+      })
+      .catch(err => {
+        return null;
+      });
+  });
 
   return app.mongoose.model("user", userSchema);
 };

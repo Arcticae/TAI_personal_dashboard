@@ -8,9 +8,6 @@ module.exports = app => {
     date: {
       type: Date,
       required: true
-    },
-    content: {
-      type: String
     }
   });
   return app.mongoose.model("reminder", reminderSchema);

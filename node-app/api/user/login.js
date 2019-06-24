@@ -67,44 +67,25 @@ module.exports = app => {
   });
 
   // @path GET /api/user/
-  // @desc Retrieve the user's data with given id, according to given token
+  // @desc Retrieve the user's data, according to given token
   // @access Private
   // @headers <token>
   router.get("/", (req, res) => {
     const token = req.headers.token;
     const User = app.model.auth.user;
-    const Token = app.model.auth.token;
     if (isEmpty(token)) {
       return res.status(400).json({
         token: "No API token provided in headers"
       });
     }
-    Token.findOne({ value: token })
-      .then(dbToken => {
-        if (dbToken) {
-          const userId = dbToken.owner;
-          User.findOne({ _id: userId })
-            .then(user => {
-              if (user) {
-                return res.json(user);
-              } else {
-                return res
-                  .status(404)
-                  .json({ user: "Owner of the token not found" });
-              }
-            })
-            .catch(err => {
-              return res.status(404).json({ reason: "Database unavailable" });
-            });
-        } else {
-          return res
-            .status(404)
-            .json({ token: "Token does not exist in database" });
-        }
-      })
-      .catch(err => {
-        return res.status(404).json({ reason: "Database unavailable" });
-      });
+    const tokenOwner = User.findByToken(token);
+    if (!isEmpty(tokenOwner)) {
+      return res.json(tokenOwner);
+    } else {
+      return res
+        .status(404)
+        .json({ token: "Owner of that token was not found in database" });
+    }
   });
 
   return router;

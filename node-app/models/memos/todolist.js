@@ -5,7 +5,7 @@ module.exports = app => {
       type: Schema.Types.ObjectId,
       required: true
     },
-    name: {
+    header: {
       type: String,
       required: true
     },

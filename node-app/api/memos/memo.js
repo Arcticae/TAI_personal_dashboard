@@ -2,48 +2,43 @@ const express = require("express");
 const router = express.Router();
 const isEmpty = require("../../utils").params.isEmpty;
 module.exports = app => {
-  // @path POST /api/timeline/event
-  // @desc Add the event to your "dashboard"
+  // @path POST /api/memos/memo
+  // @desc Add the memo to your "dashboard"
   // @access Private
   // @header <token>
   // @body <header> <time> ~<content>
-  // @other Date-Time format used on backend: yyyy-mm-dd h:min:00.0 GMT
   router.post(
-    "/event",
+    "/memo",
     app.middlewares.loginRedirect,
     app.middlewares.upload.none(),
     (req, res) => {
-      const Event = app.model.event;
+      const Memo = app.model.memo;
       const header = req.body.header;
-      const time = req.body.time;
       const content = req.body.content;
       const errors = {};
 
       if (isEmpty(header)) {
         errors.header = "Header field is required";
       }
-      if (isEmpty(time)) {
-        errors.time = "Event time field is required";
-      }
       if (!isEmpty(errors)) {
         return res.status(400).json(errors);
       }
+
       const user = User.findByToken(req.headers.token);
       if (!isEmpty(user)) {
-        Event.findOne({ header })
+        Memo.findOne({ header })
           .then(event => {
             if (event) {
               return res
                 .status(400)
-                .json({ header: "Event with that header already exists" });
+                .json({ header: "Memo with that header already exists" });
             } else {
-              const newEvent = new Event({
+              const newMemo = new Memo({
                 header,
                 content,
-                time: Date.new(Date.parse(time)),
                 owner: user._id
               });
-              newEvent.save(err => {
+              newMemo.save(err => {
                 if (err) {
                   return res.status(404).json({ reason: "Database error" });
                 } else {
@@ -60,18 +55,18 @@ module.exports = app => {
       }
     }
   );
-  // @path GET /api/timeline/event/:id
-  // @desc Get event with specific id
+  // @path GET /api/memos/memo/:id
+  // @desc Get memo with specific id
   // @access Private
   // @header <token>
   // @params <id>
-  router.get("/event/:id", app.middlewares.loginRedirect, (req, res) => {
-    const Event = app.model.event;
+  router.get("/memo/:id", app.middlewares.loginRedirect, (req, res) => {
+    const Memo = app.model.memo;
     const User = app.model.user;
-    const eventId = req.params.id;
+    const memoId = req.params.id;
 
-    if (isEmpty(eventId)) {
-      return res.status(400).json({ id: "No event id given" });
+    if (isEmpty(memoId)) {
+      return res.status(400).json({ id: "No memo id given" });
     }
     if (isEmpty(req.headers.token)) {
       return res
@@ -80,13 +75,10 @@ module.exports = app => {
     }
     const user = User.findByToken(req.headers.token);
     if (!isEmpty(user)) {
-      Event.findOne({ owner: user._id, _id: eventId })
-        .populate({
-          path: "reminders"
-        })
-        .then(event => {
-          if (event) return res.json(event);
-          else return res.status(404).json({ id: "No event with that id" });
+      Memo.findOne({ owner: user._id, _id: memoId })
+        .then(memo => {
+          if (memo) return res.json(memo);
+          else return res.status(404).json({ id: "No memo with that id" });
         })
         .catch(() => {
           return res.status(404).json({ reason: "Database unavailable" });
@@ -95,12 +87,12 @@ module.exports = app => {
       return req.status(401).json({ reason: "Unauthorized" });
     }
   });
-  // @path GET /api/timeline/event/all
-  // @desc Get all event's id's and headers
+  // @path GET /api/memos/memo/all
+  // @desc Get all memo's id's and headers
   // @access Private
   // @header <token>
-  router.get("/event/all", app.middlewares.loginRedirect, (req, res) => {
-    const Event = app.model.event;
+  router.get("/memo/all", app.middlewares.loginRedirect, (req, res) => {
+    const Memo = app.model.memo;
     const User = app.model.user;
 
     if (isEmpty(req.headers.token)) {
@@ -110,13 +102,13 @@ module.exports = app => {
     }
     const user = User.findByToken(req.headers.token);
     if (user) {
-      Event.find({ owner: user._id }, "_id header")
-        .then(events => {
-          if (!isEmpty(events)) return res.json(events);
+      Memo.find({ owner: user._id }, "_id header")
+        .then(memos => {
+          if (!isEmpty(memos)) return res.json(memos);
           else
             return res
               .status(404)
-              .json({ id: "No events associated with your user" });
+              .json({ id: "No memos associated with your user" });
         })
         .catch(() => {
           return res.status(404).json({ reason: "Database unavailable" });
