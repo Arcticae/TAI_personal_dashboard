@@ -1,0 +1,100 @@
+  // @path POST /api/memos/memo
+  // @desc Add the memo to your "dashboard"
+  // @access Private
+  // @header <token>
+  // @body <header> <time> ~<content>
+
+  // @path GET /api/memos/memo/:id
+  // @desc Get memo with specific id
+  // @access Private
+  // @header <token>
+  // @params <id>
+
+   // @path GET /api/memos/memo/all
+  // @desc Get all memo's id's and headers
+  // @access Private
+  // @header <token>
+
+
+  //// TODOLIST
+
+  // @path POST /api/memos/todolist
+  // @desc Add todolist to your dashboard
+  // @access Private
+  // @header <token>
+  // @body <header> ~<content: [{ done: Boolean, content: String}]>
+
+  // @path PUT /api/memos/todolist
+  // @desc Modify todolist with content
+  // @access Private
+  // @header <token>
+  // @body <id> <content>
+
+  // @path GET /api/memos/todolist
+  // @desc Get todolist's content
+  // @access Private
+  // @header <token>
+  // @body <id> <content>
+  
+  // @path GET /api/memos/todolist/all
+  // @desc Get id's and headers of all your todolists
+  // @access Private
+  // @header <token>
+
+  //// EVENTS
+
+  // @path POST /api/timeline/event
+  // @desc Add the event to your "dashboard"
+  // @access Private
+  // @header <token>
+  // @body <header> <time> ~<content>
+
+  // @path GET /api/timeline/event/:id
+  // @desc Get event with specific id
+  // @access Private
+  // @header <token>
+  // @params <id>
+
+  // @path GET /api/timeline/event/all
+  // @desc Get all event's id's and headers
+  // @access Private
+  // @header <token>
+
+  //// REMINDERS
+
+  // @path POST /api/timeline/reminder/
+  // @desc Add list of dates (reminders), and binds it to an event optionally
+  // @access Private
+  // @header <token>
+  // @body <times:[Date]> ~<eventId>
+
+
+  // @path GET /api/timeline/event/:id/reminder
+  // @desc Get all event's reminders
+  // @access Private
+  // @header <token>
+  // @params <event_id>
+
+   // @path GET /api/timeline/reminder
+  // @desc Get all user's reminders
+  // @access Private
+  // @header <token>
+  // @params <id>
+
+  //// USER 
+
+  
+  // @path POST /api/user/login
+  // @desc Log in the user and retrieve the token
+  // @access Public
+  // @body <email> <password>
+
+  // @path GET /api/user/
+  // @desc Retrieve the user's data, according to given token
+  // @access Private
+  // @headers <token>
+
+  // @path POST /api/user/register
+  // @desc Register the user and retrieve the token
+  // @access Public
+  // @body <email> <password> <username>
