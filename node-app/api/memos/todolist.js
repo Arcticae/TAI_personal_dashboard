@@ -81,7 +81,6 @@ module.exports = app => {
   // @access Private
   // @header <token>
   // @body <id> <content>
-  //TODO: Implement validation of parameters
   router.put("/todolist", app.middlewares.loginRedirect, (req, res) => {
     const User = app.model.user;
     const ToDoList = app.model.todolist;
@@ -148,7 +147,7 @@ module.exports = app => {
   // @desc Get todolist's content
   // @access Private
   // @header <token>
-  // @body <id> <content>
+  // @body <id>
   router.get("/todolist", app.middlewares.loginRedirect, (req, res) => {
     const User = app.model.user;
     const ToDoList = app.model.todolist;

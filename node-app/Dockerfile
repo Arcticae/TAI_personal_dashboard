@@ -4,7 +4,7 @@ WORKDIR /node-app
 
 COPY package*.json /node-app/
 
-RUN npm install -g npm@5.6.0
+RUN npm install -g npm@5.6.0 && npm install
 
 COPY . /node-app/
 

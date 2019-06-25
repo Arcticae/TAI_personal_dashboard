@@ -3,11 +3,11 @@ const utils = require("./utils");
 const express = require("express");
 const schedule = require("node-schedule");
 const app = express();
-const morgan = require("morgan");
+// const morgan = require("morgan");
 app.mongoose = require("mongoose");
 
 app.use(express.json({ extended: true })); // to support JSON-encoded bodies
-app.use(morgan("dev"));
+// app.use(morgan("dev"));
 
 const NODE_ENV = process.env.NODE_ENV.trim() || "dev"; // ten trim jest po chuj
 const config = {
