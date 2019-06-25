@@ -102,7 +102,7 @@ module.exports = app => {
   // @desc Get all event's reminders
   // @access Private
   // @header <token>
-  // @body <event_id>
+  // @body <id>
   router.get("/event/reminder", app.middlewares.loginRedirect, (req, res) => {
     const Event = app.model.event;
     const User = app.model.user;
