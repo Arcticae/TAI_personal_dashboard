@@ -13,12 +13,30 @@ module.exports = app => {
 
     const { header, content } = req.body;
     const errors = {};
-    if (isEmpty(header)) {
-      errors.header = "Header field is required";
-    }
-    if (!isEmpty(errors)) {
-      return res.status(400).json(errors);
-    }
+    if (isEmpty(header)) errors.header = "Header field is required";
+
+    if (!content instanceof Array)
+      return res
+        .status(400)
+        .json({ content: "Content field is not an array." });
+
+    content.forEach(v => {
+      if (!v.hasOwnProperty("done"))
+        errors.done = "No done key in one of the content's elements";
+      if (!v.hasOwnProperty("content"))
+        errors.content = "No content key in one of the content's elements ";
+    });
+    //validate here and after, not to crash because of non-existing property
+    if (!isEmpty(errors)) return res.status(400).json(errors);
+    content.forEach(v => {
+      try {
+        JSON.parse(v.done);
+      } catch (ex) {
+        errors.done =
+          "One of the done properties has invalid non-boolean value";
+      }
+    });
+    if (!isEmpty(errors)) return res.status(400).json(errors);
 
     User.findByToken(req.headers.token)
       .then(user => {
@@ -44,14 +62,19 @@ module.exports = app => {
                 });
               }
             })
-            .catch(() => {
+            .catch(err => {
+              //validation fails here also
+              console.log(err);
               return res.status(404).json({ reason: "Database error" });
             });
         } else {
           return res.status(401).json({ reason: "Unauthorized" });
         }
       })
-      .catch(err => res.status(404).json({ reason: "Database error" }));
+      .catch(err => {
+        console.log(err);
+        res.status(404).json({ reason: "Database error" });
+      });
   });
   // @path PUT /api/memos/todolist
   // @desc Modify todolist with content
@@ -65,12 +88,29 @@ module.exports = app => {
 
     const { id, content } = req.body;
     const errors = {};
-    if (isEmpty(id)) {
-      errors.id = "id field is required";
-    }
-    if (!isEmpty(errors)) {
-      return res.status(400).json(errors);
-    }
+
+    if (!content instanceof Array)
+      return res
+        .status(400)
+        .json({ content: "Content field is not an array." });
+
+    content.forEach(v => {
+      if (!v.hasOwnProperty("done"))
+        errors.done = "No done key in one of the content's elements";
+      if (!v.hasOwnProperty("content"))
+        errors.content = "No content key in one of the content's elements ";
+    });
+    //validate here and after, not to crash because of non-existing property
+    if (!isEmpty(errors)) return res.status(400).json(errors);
+    content.forEach(v => {
+      try {
+        JSON.parse(v.done);
+      } catch (ex) {
+        errors.done =
+          "One of the done properties has invalid non-boolean value";
+      }
+    });
+    if (!isEmpty(errors)) return res.status(400).json(errors);
     User.findByToken(req.headers.token)
       .then(user => {
         if (!isEmpty(user)) {
@@ -157,15 +197,13 @@ module.exports = app => {
     User.findByToken(req.headers.token)
       .then(user => {
         if (!isEmpty(user)) {
-          ToDoList.find({ _id: id, owner: user._id })
+          ToDoList.find({ owner: user._id })
+            .select("header _id")
             .then(list => {
               if (list) {
-                //TODO: Implement mapping of actual todolists to id-header pairs
-                return list;
+                return res.json(list);
               } else {
-                return res
-                  .status(404)
-                  .json({ id: "ToDoList with that id does not exist" });
+                return res.status(404).json({ id: "You have no todolists" });
               }
             })
             .catch(() => {

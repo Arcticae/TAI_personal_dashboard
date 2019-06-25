@@ -6,7 +6,7 @@ module.exports = app => {
   // @desc Add the memo to your "dashboard"
   // @access Private
   // @header <token>
-  // @body <header> <time> ~<content>
+  // @body <header> ~<content>
   router.post(
     "/memo",
     app.middlewares.loginRedirect,
@@ -27,7 +27,7 @@ module.exports = app => {
       User.findByToken(req.headers.token)
         .then(user => {
           if (!isEmpty(user)) {
-            Memo.findOne({ header })
+            Memo.findOne({ header, owner: user._id })
               .then(memo => {
                 if (memo) {
                   return res
@@ -43,7 +43,7 @@ module.exports = app => {
                     if (err) {
                       return res.status(404).json({ reason: "Database error" });
                     } else {
-                      return res.json(newEvent);
+                      return res.json(newMemo);
                     }
                   });
                 }
@@ -61,15 +61,15 @@ module.exports = app => {
         });
     }
   );
-  // @path GET /api/memos/memo/:id
+  // @path GET /api/memos/memo/
   // @desc Get memo with specific id
   // @access Private
   // @header <token>
   // @params <id>
-  router.get("/memo/:id", app.middlewares.loginRedirect, (req, res) => {
+  router.get("/memo/", app.middlewares.loginRedirect, (req, res) => {
     const Memo = app.model.memo;
     const User = app.model.user;
-    const memoId = req.params.id;
+    const memoId = req.body.id;
 
     if (isEmpty(memoId)) {
       return res.status(400).json({ id: "No memo id given" });
@@ -107,23 +107,21 @@ module.exports = app => {
     const Memo = app.model.memo;
     const User = app.model.user;
 
-    if (isEmpty(req.headers.token)) {
-      return res
-        .status(400)
-        .json({ token: "No API token provided in the headers" });
-    }
     User.findByToken(req.headers.token)
       .then(user => {
         if (user) {
-          Memo.find({ owner: user._id }, "_id header")
+          Memo.find({ owner: user._id })
+            .select("_id header")
             .then(memos => {
+              console.log("Got some memos");
               if (!isEmpty(memos)) return res.json(memos);
               else
                 return res
                   .status(404)
                   .json({ id: "No memos associated with your user" });
             })
-            .catch(() => {
+            .catch(err => {
+              console.log(err);
               return res.status(404).json({ reason: "Database unavailable" });
             });
         } else {

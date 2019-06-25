@@ -6,19 +6,36 @@ module.exports = app => {
   // @desc Add list of dates (reminders), and binds it to an event optionally
   // @access Private
   // @header <token>
-  // @body <times:[Date]> ~<eventId>
-  //TODO: test failures in this
-  router.post("/reminder/", app.middlewares.loginRedirect, (req, res) => {
+  // @body <content:[{Date,String}]> ~<eventId>
+  router.post("/reminder", app.middlewares.loginRedirect, (req, res) => {
     const Reminder = app.model.reminder;
     const User = app.model.user;
+    const Event = app.model.event;
 
-    const { eventId, times } = req.body;
+    const { eventId, content } = req.body;
 
     const errors = {};
 
-    if (isEmpty(times)) {
-      errors.times = "Times field is required";
+    if (isEmpty(content)) {
+      errors.content = "Content field is required";
     }
+    if (!isEmpty(errors)) {
+      return res.status(400).json(errors);
+    }
+    if (!content instanceof Array) {
+      errors.content =
+        "Content field needs to be array of entries date: <Date>, content:<String>  ";
+    }
+    if (!isEmpty(errors)) {
+      return res.status(400).json(errors);
+    }
+    content.forEach(v => {
+      if (!v.hasOwnProperty("date"))
+        errors.date = "Missing date property in one of the entries";
+
+      if (!v.hasOwnProperty("content"))
+        errors.date = "Missing content property in one of the entries";
+    });
 
     if (!isEmpty(errors)) {
       return res.status(400).json(errors);
@@ -26,115 +43,106 @@ module.exports = app => {
 
     User.findByToken(req.headers.token)
       .then(user => {
-        reminders = times
-          .map(v => {
-            time = Date.parse(v);
-            if (!isNan(time)) {
-              return new Date(time);
-            } else {
-              errors.times = "Invalid format of one of dates";
-              res.status(400).json(errors);
-            }
-          })
-          .map(date => {
-            newReminder = new Reminder({
-              date,
+        reminders = content.map(v => {
+          time = Date.parse(v.date);
+          if (!(time === NaN)) {
+            return { ...v, date: new Date(time) };
+          } else {
+            errors.content = "Invalid format of one of dates";
+          }
+        });
+        if (!isEmpty(errors)) return res.status(400).json(errors);
+        reminders = reminders.map(
+          v =>
+            new Reminder({
+              date: v.date,
+              content: v.content,
               owner: user._id
-            });
-          })
-          .forEach(reminder => {
-            reminder.save(error => {
-              if (error) {
-                return res.status(404).json({ reason: "Database error" });
-              }
-            });
+            })
+        );
+
+        for (reminder of reminders) {
+          reminder.save(error => {
+            if (error) {
+              console.log(error);
+              return res.status(404).json({ reason: "Database error" });
+            }
           });
+        }
 
         if (!isEmpty(eventId)) {
           //Bind to event
-          Event.findOneAndUpdate(
-            { _id: eventId, owner: user._id },
-            { $push: { reminders: reminders.map(rem => rem._id) } },
-            error => {
-              if (error) {
-                return res.status(404).json({ reason: "Database error" });
-              } else {
-                return res.json(reminders);
-              }
-            }
-          );
+          const reminders_ids = reminders.map(rem => rem._id);
+          console.log(reminders_ids);
+          Event.findOne({ _id: eventId, owner: user._id })
+            .then(event => {
+              event.reminders.push(...reminders_ids);
+              console.log(event);
+              event.save(error => {
+                if (error) {
+                  console.log(error);
+                  return res.status(404).json({ reason: "Database error" });
+                } else {
+                  return res.json(reminders);
+                }
+              });
+            })
+            .catch(err => {
+              console.log(err);
+              return res.status(404).json({ reason: "Database error" });
+            });
         }
-
-        return res.json(reminders);
       })
       .catch(err => {
+        console.log(err);
         return res.status(404).json({ reason: "Database error" });
       });
   });
-  // @path GET /api/timeline/event/:id/reminder
+  // @path GET /api/timeline/event/reminder
   // @desc Get all event's reminders
   // @access Private
   // @header <token>
-  // @params <event_id>
-  router.get(
-    "/event/:id/reminder",
-    app.middlewares.loginRedirect,
-    (req, res) => {
-      const Event = app.model.event;
-      const User = app.model.user;
-      const eventId = req.params.id;
-
-      if (isEmpty(eventId)) {
-        return res.status(400).json({ id: "No event id given" });
-      }
-      if (isEmpty(req.headers.token)) {
-        return res
-          .status(400)
-          .json({ token: "No API token provided in the headers" });
-      }
-      User.findByToken(req.headers.token)
-        .then(user => {
-          if (user) {
-            Event.findOne({ owner: user._id, _id: eventId })
-              .populate({
-                path: "reminders"
-              })
-              .then(event => {
-                if (event) return res.json({ reminders: event.reminders });
-                else
-                  return res.status(404).json({ id: "No event with that id" });
-              })
-              .catch(() => {
-                return res.status(404).json({ reason: "Database unavailable" });
-              });
-          } else {
-            return req.status(401).json({ reason: "Unauthorized" });
-          }
-        })
-        .catch(err => {
-          console.log(err);
-          return res.status(404).json({ reason: "Database error" });
-        });
-    }
-  );
-  // @path GET /api/timeline/reminder
-  // @desc Get all user's reminders
-  // @access Private
-  // @header <token>
-  // @params <id>
-  router.get("/reminder/all", app.middlewares.loginRedirect, (req, res) => {
+  // @body <event_id>
+  router.get("/event/reminder", app.middlewares.loginRedirect, (req, res) => {
+    const Event = app.model.event;
     const User = app.model.user;
-    const Reminder = app.model.reminder;
-    const eventId = req.params.id;
+    const eventId = req.body.id;
 
     if (isEmpty(eventId)) {
       return res.status(400).json({ id: "No event id given" });
     }
-    if (isEmpty(req.headers.token)) {
-      return res
-        .status(400)
-        .json({ token: "No API token provided in the headers" });
-    }
+
+    User.findByToken(req.headers.token)
+      .then(user => {
+        if (user) {
+          Event.findOne({ owner: user._id, _id: eventId })
+            .populate({
+              path: "reminders"
+            })
+            .then(event => {
+              if (event) return res.json({ reminders: event.reminders });
+              else return res.status(404).json({ id: "No event with that id" });
+            })
+            .catch(() => {
+              return res.status(404).json({ reason: "Database unavailable" });
+            });
+        } else {
+          return req.status(401).json({ reason: "Unauthorized" });
+        }
+      })
+      .catch(err => {
+        console.log(err);
+        return res.status(404).json({ reason: "Database error" });
+      });
+  });
+  // @path GET /api/timeline/reminder/all
+  // @desc Get all user's reminders
+  // @access Private
+  // @header <token>
+  router.get("/reminder/all", app.middlewares.loginRedirect, (req, res) => {
+    const User = app.model.user;
+    const Reminder = app.model.reminder;
+
     User.findByToken(req.headers.token)
       .then(user => {
         if (user) {

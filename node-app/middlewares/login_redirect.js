@@ -21,5 +21,8 @@ module.exports = app => (req, res, next) => {
         return res.status(404).json({ reason: "Database unavailable" });
       });
   } else {
+    return res
+      .status(401)
+      .json({ token: "No API token provided in the headers" });
   }
 };

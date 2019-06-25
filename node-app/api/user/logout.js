@@ -7,16 +7,20 @@ const router = express.Router();
 // @body <token>
 module.exports = app => {
   router.post("/logout", app.middlewares.loginRedirect, (req, res) => {
-    const token = req.body.token;
+    const token = req.headers.token;
     if (!token)
       return res.json({
-        error: true,
-        reason: "Insufficient parameters supplied to request"
+        token: "API token not provided in the headers"
       });
-    app.model.token.findOneAndDelete({ value: token }).exec((error, _) => {
-      if (error)
+    app.model.token
+      .findOneAndDelete({ value: token })
+      .then(_ => {
+        return res.status(200).json({ token: "OK" });
+      })
+      .catch(err => {
+        console.log(err);
         return res.status(404).json({ reason: "Token revoke went wrong" });
-    });
+      });
   });
   return router;
 };

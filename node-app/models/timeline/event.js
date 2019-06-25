@@ -18,7 +18,8 @@ module.exports = app => {
     },
     reminders: [
       {
-        type: Schema.Types.ObjectId
+        type: Schema.Types.ObjectId,
+        ref: "reminder"
       }
     ]
   });

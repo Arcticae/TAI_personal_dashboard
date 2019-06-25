@@ -9,16 +9,16 @@ module.exports = app => {
   // @body <header> <time> ~<content>
   router.post("/event", app.middlewares.loginRedirect, (req, res) => {
     const Event = app.model.event;
+    const User = app.model.user;
     const header = req.body.header;
-    const time = req.body.time;
-    const content = req.body.content;
+    const { date, content } = req.body;
     const errors = {};
 
     if (isEmpty(header)) {
       errors.header = "Header field is required";
     }
-    if (isEmpty(time)) {
-      errors.time = "Event time field is required";
+    if (isEmpty(date)) {
+      errors.date = "Event date field is required";
     }
     if (!isEmpty(errors)) {
       return res.status(400).json(errors);
@@ -26,7 +26,7 @@ module.exports = app => {
     User.findByToken(req.headers.token)
       .then(user => {
         if (!isEmpty(user)) {
-          Event.findOne({ header })
+          Event.findOne({ header, owner: user._id })
             .then(event => {
               if (event) {
                 return res
@@ -36,11 +36,12 @@ module.exports = app => {
                 const newEvent = new Event({
                   header,
                   content,
-                  time: Date.new(Date.parse(time)),
+                  date: new Date(Date.parse(date)),
                   owner: user._id
                 });
                 newEvent.save(err => {
                   if (err) {
+                    console.log(err);
                     return res.status(404).json({ reason: "Database error" });
                   } else {
                     return res.json(newEvent);
@@ -48,7 +49,8 @@ module.exports = app => {
                 });
               }
             })
-            .catch(() => {
+            .catch(err => {
+              console.log(err);
               return res.status(404).json({ reason: "Database error" });
             });
         } else {
@@ -60,15 +62,15 @@ module.exports = app => {
         return res.status(404).json({ reason: "Database error" });
       });
   });
-  // @path GET /api/timeline/event/:id
+  // @path GET /api/timeline/event/
   // @desc Get event with specific id
   // @access Private
   // @header <token>
-  // @params <id>
-  router.get("/event/:id", app.middlewares.loginRedirect, (req, res) => {
+  // @body <id>
+  router.get("/event", app.middlewares.loginRedirect, (req, res) => {
     const Event = app.model.event;
     const User = app.model.user;
-    const eventId = req.params.id;
+    const eventId = req.body.id;
 
     if (isEmpty(eventId)) {
       return res.status(400).json({ id: "No event id given" });
