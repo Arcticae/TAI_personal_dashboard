@@ -1,3 +1,4 @@
+const isEmpty = require("../../utils").params.isEmpty;
 module.exports = app => {
   const userSchema = new app.mongoose.Schema({
     username: {
@@ -13,27 +14,23 @@ module.exports = app => {
       required: true
     }
   });
-  userSchema.static("findByToken", token => {
-    app.models.token
-      .findOne({ value: token })
-      .then(dbToken => {
-        if (dbToken) {
-          const userId = dbToken.owner;
-          this.findOne({ _id: userId })
-            .then(user => {
-              return user;
-            })
-            .catch(err => {
-              return null;
-            });
-        } else {
-          return null;
-        }
-      })
-      .catch(err => {
-        return null;
-      });
-  });
 
+  userSchema.statics.findByToken = async token => {
+    const Token = app.model.token;
+    const dbToken = await Token.findOne({ value: token }).exec();
+    if (!isEmpty(dbToken)) {
+      const user = await app.mongoose
+        .model("user")
+        .findOne({ _id: dbToken.owner })
+        .exec();
+      if (!isEmpty(user)) {
+        return user;
+      } else {
+        return null;
+      }
+    } else {
+      return null;
+    }
+  };
   return app.mongoose.model("user", userSchema);
 };

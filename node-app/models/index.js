@@ -8,17 +8,14 @@ module.exports = app => {
   const reminder = require("./timeline/reminder")(app);
 
   return {
-    auth: {
-      user,
-      token
-    },
-    memos: {
-      memo,
-      todolist
-    },
-    timeline: {
-      event,
-      reminder
-    }
+    //auth
+    user,
+    token,
+    //memo
+    memo,
+    todolist,
+    //timeline
+    event,
+    reminder
   };
 };

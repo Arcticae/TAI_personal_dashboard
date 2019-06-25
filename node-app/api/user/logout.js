@@ -6,24 +6,17 @@ const router = express.Router();
 // @header <token>
 // @body <token>
 module.exports = app => {
-  router.post(
-    "/logout",
-    app.middlewares.loginRedirect,
-    app.middlewares.upload.none(),
-    (req, res) => {
-      let token = req.body.token;
-      if (!token)
-        return res.json({
-          error: true,
-          reason: "Insufficient parameters supplied to request"
-        });
-      app.model.auth.token
-        .findOneAndDelete({ value: token })
-        .exec((error, _) => {
-          if (error)
-            return res.status(404).json({ reason: "Token revoke went wrong" });
-        });
-    }
-  );
+  router.post("/logout", app.middlewares.loginRedirect, (req, res) => {
+    const token = req.body.token;
+    if (!token)
+      return res.json({
+        error: true,
+        reason: "Insufficient parameters supplied to request"
+      });
+    app.model.token.findOneAndDelete({ value: token }).exec((error, _) => {
+      if (error)
+        return res.status(404).json({ reason: "Token revoke went wrong" });
+    });
+  });
   return router;
 };

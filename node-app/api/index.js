@@ -10,8 +10,8 @@ module.exports = app => {
   router.use("/timeline", require("./timeline/event")(app));
   router.use("/timeline", require("./timeline/reminder")(app));
   //Memo routes
-  router.use("/memo", require("./memos/memo")(app));
-  router.use("/memo", require("./memos/todolist")(app));
+  router.use("/memos", require("./memos/memo")(app));
+  router.use("/memos", require("./memos/todolist")(app));
 
   return router;
 };

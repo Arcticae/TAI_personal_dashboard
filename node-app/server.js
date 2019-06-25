@@ -3,15 +3,16 @@ const utils = require("./utils");
 const express = require("express");
 const schedule = require("node-schedule");
 const app = express();
+const morgan = require("morgan");
 app.mongoose = require("mongoose");
-const multer = require("multer");
 
 app.use(express.json({ extended: true })); // to support JSON-encoded bodies
-app.use(express.urlencoded({ extended: true })); // to support some other shit
+app.use(morgan("dev"));
 
+const NODE_ENV = process.env.NODE_ENV.trim() || "dev"; // ten trim jest po chuj
 const config = {
   mongoDBPath: `mongodb://${
-    process.env.NODE_ENV === "dev" ? "localhost" : "mongodb"
+    NODE_ENV === "dev" ? "localhost" : "mongodb"
   }:27017/node-app-db`,
   SESS_TIMEOUT: 10,
   APP_PORT: 6969,
@@ -21,7 +22,6 @@ const config = {
     reconnectInterval: 1000 //miliseconds
   }
 };
-
 app.config = config;
 app.mongoose
   .connect(app.config.mongoDBPath, app.config.dbConnectionOptions)
@@ -34,9 +34,9 @@ app.mongoose
 
 //Middlewares
 app.middlewares = require("./middlewares")(app);
-app.middlewares.upload = multer();
 //Models
 app.model = require("./models")(app);
+//Routes
 app.use("/api", require("./api")(app));
 
 function start_app() {
@@ -45,7 +45,7 @@ function start_app() {
   schedule.scheduleJob(` */${app.config.SESS_TIMEOUT} * * * * `, () => {
     console.log("[INFO] Scheduled revoked tokens removal is in process");
 
-    app.model.auth.token
+    app.model.token
       .deleteMany({
         valid_to: { $lt: new Date(Date.now()) }
       })

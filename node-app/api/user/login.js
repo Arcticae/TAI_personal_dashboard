@@ -5,14 +5,14 @@ const isEmpty = utils.params.isEmpty;
 const hashToken = utils.security.hashToken;
 
 module.exports = app => {
-  const Token = app.model.auth.token;
-  const User = app.model.auth.user;
+  const Token = app.model.token;
+  const User = app.model.user;
 
   // @path POST /api/user/login
   // @desc Log in the user and retrieve the token
   // @access Public
   // @body <email> <password>
-  router.post("/login", app.middlewares.upload.none(), (req, res) => {
+  router.post("/login", (req, res) => {
     const email = req.body.email;
     const password = req.body.password;
     errors = {};
@@ -72,20 +72,26 @@ module.exports = app => {
   // @headers <token>
   router.get("/", (req, res) => {
     const token = req.headers.token;
-    const User = app.model.auth.user;
+    const User = app.model.user;
     if (isEmpty(token)) {
       return res.status(400).json({
         token: "No API token provided in headers"
       });
     }
-    const tokenOwner = User.findByToken(token);
-    if (!isEmpty(tokenOwner)) {
-      return res.json(tokenOwner);
-    } else {
-      return res
-        .status(404)
-        .json({ token: "Owner of that token was not found in database" });
-    }
+    User.findByToken(token)
+      .then(tokenOwner => {
+        if (!isEmpty(tokenOwner)) {
+          return res.json(tokenOwner);
+        } else {
+          return res
+            .status(404)
+            .json({ token: "Owner of that token was not found in database" });
+        }
+      })
+      .catch(err => {
+        console.log(err);
+        return res.status(404).json({ reason: "Database error" });
+      });
   });
 
   return router;

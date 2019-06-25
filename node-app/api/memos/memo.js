@@ -10,11 +10,11 @@ module.exports = app => {
   router.post(
     "/memo",
     app.middlewares.loginRedirect,
-    app.middlewares.upload.none(),
+
     (req, res) => {
       const Memo = app.model.memo;
-      const header = req.body.header;
-      const content = req.body.content;
+      const User = app.model.user;
+      const { header, content } = req.body;
       const errors = {};
 
       if (isEmpty(header)) {
@@ -24,35 +24,41 @@ module.exports = app => {
         return res.status(400).json(errors);
       }
 
-      const user = User.findByToken(req.headers.token);
-      if (!isEmpty(user)) {
-        Memo.findOne({ header })
-          .then(event => {
-            if (event) {
-              return res
-                .status(400)
-                .json({ header: "Memo with that header already exists" });
-            } else {
-              const newMemo = new Memo({
-                header,
-                content,
-                owner: user._id
-              });
-              newMemo.save(err => {
-                if (err) {
-                  return res.status(404).json({ reason: "Database error" });
+      User.findByToken(req.headers.token)
+        .then(user => {
+          if (!isEmpty(user)) {
+            Memo.findOne({ header })
+              .then(memo => {
+                if (memo) {
+                  return res
+                    .status(400)
+                    .json({ header: "Memo with that header already exists" });
                 } else {
-                  return res.json(newEvent);
+                  const newMemo = new Memo({
+                    header,
+                    content,
+                    owner: user._id
+                  });
+                  newMemo.save(err => {
+                    if (err) {
+                      return res.status(404).json({ reason: "Database error" });
+                    } else {
+                      return res.json(newEvent);
+                    }
+                  });
                 }
+              })
+              .catch(() => {
+                return res.status(404).json({ reason: "Database error" });
               });
-            }
-          })
-          .catch(() => {
-            return res.status(404).json({ reason: "Database error" });
-          });
-      } else {
-        return res.status(401).json({ reason: "Unauthorized" });
-      }
+          } else {
+            return res.status(401).json({ reason: "Unauthorized" });
+          }
+        })
+        .catch(err => {
+          console.log(err);
+          return res.status(404).json({ reason: "Database error" });
+        });
     }
   );
   // @path GET /api/memos/memo/:id
@@ -73,19 +79,25 @@ module.exports = app => {
         .status(400)
         .json({ token: "No API token provided in the headers" });
     }
-    const user = User.findByToken(req.headers.token);
-    if (!isEmpty(user)) {
-      Memo.findOne({ owner: user._id, _id: memoId })
-        .then(memo => {
-          if (memo) return res.json(memo);
-          else return res.status(404).json({ id: "No memo with that id" });
-        })
-        .catch(() => {
-          return res.status(404).json({ reason: "Database unavailable" });
-        });
-    } else {
-      return req.status(401).json({ reason: "Unauthorized" });
-    }
+    User.findByToken(req.headers.token)
+      .then(user => {
+        if (!isEmpty(user)) {
+          Memo.findOne({ owner: user._id, _id: memoId })
+            .then(memo => {
+              if (memo) return res.json(memo);
+              else return res.status(404).json({ id: "No memo with that id" });
+            })
+            .catch(() => {
+              return res.status(404).json({ reason: "Database unavailable" });
+            });
+        } else {
+          return req.status(401).json({ reason: "Unauthorized" });
+        }
+      })
+      .catch(err => {
+        console.log(err);
+        return res.status(404).json({ reason: "Database unavailable" });
+      });
   });
   // @path GET /api/memos/memo/all
   // @desc Get all memo's id's and headers
@@ -100,22 +112,28 @@ module.exports = app => {
         .status(400)
         .json({ token: "No API token provided in the headers" });
     }
-    const user = User.findByToken(req.headers.token);
-    if (user) {
-      Memo.find({ owner: user._id }, "_id header")
-        .then(memos => {
-          if (!isEmpty(memos)) return res.json(memos);
-          else
-            return res
-              .status(404)
-              .json({ id: "No memos associated with your user" });
-        })
-        .catch(() => {
-          return res.status(404).json({ reason: "Database unavailable" });
-        });
-    } else {
-      return req.status(401).json({ reason: "Unauthorized" });
-    }
+    User.findByToken(req.headers.token)
+      .then(user => {
+        if (user) {
+          Memo.find({ owner: user._id }, "_id header")
+            .then(memos => {
+              if (!isEmpty(memos)) return res.json(memos);
+              else
+                return res
+                  .status(404)
+                  .json({ id: "No memos associated with your user" });
+            })
+            .catch(() => {
+              return res.status(404).json({ reason: "Database unavailable" });
+            });
+        } else {
+          return req.status(401).json({ reason: "Unauthorized" });
+        }
+      })
+      .catch(err => {
+        console.log(err);
+        return res.status(404).json({ reason: "Database error" });
+      });
   });
   return router;
 };
