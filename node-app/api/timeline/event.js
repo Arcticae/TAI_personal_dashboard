@@ -7,7 +7,6 @@ module.exports = app => {
   // @access Private
   // @header <token>
   // @body <header> <time> ~<content>
-  // @other Date-Time format used on backend: yyyy-mm-dd h:min:00.0 GMT
   router.post("/event", app.middlewares.loginRedirect, (req, res) => {
     const Event = app.model.event;
     const header = req.body.header;

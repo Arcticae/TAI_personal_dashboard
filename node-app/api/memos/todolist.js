@@ -7,7 +7,6 @@ module.exports = app => {
   // @access Private
   // @header <token>
   // @body <header> ~<content: [{ done: Boolean, content: String}]>
-  // @other
   router.post("/todolist", app.middlewares.loginRedirect, (req, res) => {
     const User = app.model.user;
     const ToDoList = app.model.todolist;
