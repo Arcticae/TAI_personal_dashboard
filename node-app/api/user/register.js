@@ -6,12 +6,10 @@ module.exports = app => {
   // @desc Register the user and retrieve the token
   // @access Public
   // @body <email> <password> <username>
-  router.post("/register", app.middlewares.upload.none(), (req, res) => {
+  router.post("/register", (req, res) => {
     const User = app.model.user;
 
-    let username = req.body.username;
-    let password = req.body.password;
-    let email = req.body.email;
+    let { username, password, email } = req.body;
 
     let errors = {};
     if (isEmpty(email)) {

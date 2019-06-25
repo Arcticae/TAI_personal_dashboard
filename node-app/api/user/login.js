@@ -7,11 +7,12 @@ const hashToken = utils.security.hashToken;
 module.exports = app => {
   const Token = app.model.token;
   const User = app.model.user;
+
   // @path POST /api/user/login
   // @desc Log in the user and retrieve the token
   // @access Public
   // @body <email> <password>
-  router.post("/login", app.middlewares.upload.none(), (req, res) => {
+  router.post("/login", (req, res) => {
     const email = req.body.email;
     const password = req.body.password;
     errors = {};
@@ -66,43 +67,30 @@ module.exports = app => {
   });
 
   // @path GET /api/user/
-  // @desc Retrieve the user's data with given id, according to given token
+  // @desc Retrieve the user's data, according to given token
   // @access Private
   // @headers <token>
   router.get("/", (req, res) => {
     const token = req.headers.token;
     const User = app.model.user;
-    const Token = app.model.token;
     if (isEmpty(token)) {
       return res.status(400).json({
         token: "No API token provided in headers"
       });
     }
-    Token.findOne({ value: token })
-      .then(dbToken => {
-        if (dbToken) {
-          const userId = dbToken.owner;
-          User.findOne({ _id: userId })
-            .then(user => {
-              if (user) {
-                return res.json(user);
-              } else {
-                return res
-                  .status(404)
-                  .json({ user: "Owner of the token not found" });
-              }
-            })
-            .catch(err => {
-              return res.status(404).json({ reason: "Database unavailable" });
-            });
+    User.findByToken(token)
+      .then(tokenOwner => {
+        if (!isEmpty(tokenOwner)) {
+          return res.json(tokenOwner);
         } else {
           return res
             .status(404)
-            .json({ token: "Token does not exist in database" });
+            .json({ token: "Owner of that token was not found in database" });
         }
       })
       .catch(err => {
-        return res.status(404).json({ reason: "Database unavailable" });
+        console.log(err);
+        return res.status(404).json({ reason: "Database error" });
       });
   });
 

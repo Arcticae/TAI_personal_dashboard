@@ -44,4 +44,4 @@ networks:
     driver: bridge
 
 volumes:
-  mongodata:
+  mongodata: {}
