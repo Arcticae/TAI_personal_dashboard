@@ -1,6 +1,6 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import withStyles from '@material-ui/core/styles/withStyles';
-import {Redirect} from "react-router-dom";
+import { Redirect } from "react-router-dom";
 import PropTypes from 'prop-types';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Paper from '@material-ui/core/Paper';
@@ -45,13 +45,18 @@ class SignIn extends Component{
         error: false,
     };
 
-    handleChange(event) {
-        this.setState({value: event.target.value});
+    handleChange = event => {
+        this.setState({
+            [event.target.id]: event.target.value
+        });
+    };
+
+    submit() {
+        // TODO zesraj sie
     }
 
-    submit(username, password) {
-        this.state.username = username;
-        this.state.password = password;
+    register(){
+        // TODO zesraj sie
     }
 
     render() {
@@ -74,22 +79,19 @@ class SignIn extends Component{
                     <form onSubmit={this.handleSubmit}>
                         <label>
                             <Typography component="h4">
-                                Username: <input type="username" value={this.state.username} onChange={this.handleChange} />
+                                Username: <input id="username" type="username" value={this.state.username} onChange={this.handleChange} />
                             </Typography>
                         </label><br/>
                         <label>
                             <Typography component="h4">
-                                Password: <input type="password" value={this.state.password} onChange={this.handleChange} />
+                                Password: <input id="password" type="password" value={this.state.password} onChange={this.handleChange} />
                             </Typography>
                         </label><br />
-                        <Button
-                            fullWidth
-                            variant="contained"
-                            color="primary"
-                            className={classes.submit}
-                            type="submit"
-                        >
+                        <Button fullWidth variant="contained" color="primary" className={classes.submit} type="submit" action={this.submit}>
                             Sign in
+                        </Button>
+                        <Button fullWidth variant="contained" color="secondary" className={classes.submit} type="register" action={this.register}>
+                            Register
                         </Button>
                     </form>
                 </Paper>
