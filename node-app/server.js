@@ -37,6 +37,7 @@ app.model = require("./models")(app);
 app.use("/api", require("./api")(app));
 
 const revokeTokens = app => {
+  console.log("[INFO] Scheduled token removal is in progress");
   app.model.token
     .deleteMany({
       valid_to: { $lt: new Date(Date.now()) }
@@ -49,7 +50,9 @@ const revokeTokens = app => {
     });
 };
 const start_app = app => {
-  setInterval(revokeTokens, 60000 * app.config.SESS_TIMEOUT);
+  setInterval(() => {
+    revokeTokens(app);
+  }, 60000 * app.config.SESS_TIMEOUT);
 
   app.listen(config.APP_PORT, () => {
     console.log(`App is listening on port ${config.APP_PORT}`);
