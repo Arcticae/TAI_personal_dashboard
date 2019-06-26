@@ -4,7 +4,7 @@ import Dashboard from "./Dashboard";
 import SignIn from "./SignIn";
 
 function signedIn() {
-    return false;    // TODO unmock
+    return true;    // TODO unmock
 }
 
 const RootRouter = () => {
