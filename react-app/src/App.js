@@ -1,33 +1,47 @@
 import React, { Component } from 'react';
-import { Page, Button, Textarea, Panel } from 'react-blur-admin';
+import {Route, Switch, Redirect} from 'react-router-dom';
+import Dashboard from './Dashboard';
+import SignIn from "./SignIn";
+// import ProtectedRoute from "./ProtectedRoute";
+
+// const RootRouter = () => {
+//   return (
+//       <Route 
+//           render={() => (
+//               false
+//                   ? <Redirect to={{pathname: "/dashboard"}}/>
+//                   : <Redirect to={{pathname: "/sign-in"}}/>
+//           )}
+//       />
+//   );
+// }
+
+// const InnerRouter = (props) => {
+//   return (
+//       <div>
+//           <Switch>
+//               <Route exact strict path='/' component={RootRouter} />
+//               {/* <ProtectedRoute exact strict path='/dashboard' component={Dashboard}/> */}
+//               <Route exact strict path='*' render={() => "Page not found: 404"}/>
+//           </Switch>
+//       </div>
+//   );
+// };
 
 class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      textareaCount: 1
-    };
-  }
-
-  onTextChange(key, event) {
-    this.setState({ [key]: event.currentTarget.value });
-  }
-
   render() {
 
-    return (
-      <Page>
-        <Button type='add' on/>
-        <Panel title={`Textarea No.${this.state.textareaCount}`}>
-          <Textarea
-            name='textarea'
-            placeholder='Default Input'
-            label={<Button type='remove' />}
-            onChange={e => this.onTextChange('textarea', e)}
-            value={this.state.textarea} />
-        </Panel>
-      </Page>
-    );
+      console.log()
+
+      return (
+          <div>
+              <Switch>
+                  <Route exact strict path='/' component={SignIn}/>
+                  {/* <Route strict path='/' component={InnerRouter}/> */}
+                  <Route exact strict path='*' render={() => "Page not found: 404"}/>
+              </Switch>
+          </div>
+      );
   }
 }
 
