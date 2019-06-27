@@ -2,10 +2,8 @@ import React, { Component } from 'react';
 
 class Dashboard extends Component{
 
-    componentWillMount() {
-        fetch("http://localhost:6969/")
-            .then(res => res.text())
-            .then(res => this.setState({nodeRes: res}));
+    componentDidMount() {
+        // TODO fetch memos
     }
 
     render() {

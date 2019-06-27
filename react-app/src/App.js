@@ -32,21 +32,7 @@ const InnerRouter = (props) => {
 };
 
 
-class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      textareaCount: 1,
-      nodeRes: ""
-    };
-    
-  }
-
-  componentWillMount() {
-    fetch("http://localhost:6969/")
-      .then(res => res.text())
-      .then(res => this.setState({nodeRes: res}));
-  }
+class App extends Component{
 
   render() {
 

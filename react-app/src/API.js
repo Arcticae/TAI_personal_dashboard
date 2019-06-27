@@ -23,7 +23,8 @@ export default {
             body: opt.body,
             headers: opt.headers,
             credentials: 'include'
-        }).then(response => {
+        })
+            .then(response => {
             action(response);
         });
     },

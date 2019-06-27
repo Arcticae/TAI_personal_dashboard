@@ -46,26 +46,53 @@ class SignIn extends Component{
         error: false,
     };
 
+    handleLoginError = () => {
+        this.state.error = true;
+    }
+
+    fetchUserAndRedirect(token){
+        api.fetchHandleError(
+            api.endpoints.getUserData(token),
+            (response) => {
+                const user = {
+                    userId: response.id,
+                    token: token
+                };
+                localStorage.setItem('user', JSON.stringify(user));
+                // todo this.redirectAfterLogin();
+            },
+            this.handleLoginError.bind(this));
+    }
+
     handleChange = event => {
         this.setState({
             [event.target.id]: event.target.value
         });
     };
 
-    submit() {
-        // TODO zesraj sie
-    }
+    submit = () => {
+        this.state.error = false;
+        console.log(`Signing in with ${this.state.username}:${this.state.password}`);
+        api.fetchHandleError(
+            api.endpoints.signIn(this.state.username, this.state.password),
+            (response) => {
+                // todo retrieve token from response
+                this.fetchUserAndRedirect(response)
+            },
+            this.handleLoginError.bind(this)
+        )
+    };
 
     register(){
         // TODO zesraj sie
-    }
+    };
 
     render() {
         const {classes} = this.props;
         const {error} = this.state;
 
         if(signedIn())
-            return (<Redirect to={{pathname: "/overview"}}/>);
+            return (<Redirect to={{pathname: "/dashboard"}}/>);
         return (
             <main className={classes.main}>
                 <CssBaseline/>
@@ -77,7 +104,7 @@ class SignIn extends Component{
                     <Typography color="secondary">Incorrect mail or password</Typography>
                     }
                     <br /><br/>
-                    <form onSubmit={this.handleSubmit}>
+                    <form onSubmit={this.submit}>
                         <label>
                             <Typography component="h4">
                                 Username: <input id="username" type="username" value={this.state.username} onChange={this.handleChange} />
@@ -88,10 +115,10 @@ class SignIn extends Component{
                                 Password: <input id="password" type="password" value={this.state.password} onChange={this.handleChange} />
                             </Typography>
                         </label><br />
-                        <Button fullWidth variant="contained" color="primary" className={classes.submit} type="submit" action={this.submit}>
+                        <Button fullWidth variant="contained" color="primary" className={classes.submit} type="submit" onClick={this.submit}>
                             Sign in
                         </Button>
-                        <Button fullWidth variant="contained" color="secondary" className={classes.submit} type="register" action={this.register}>
+                        <Button fullWidth variant="outlined" color="primary" className={classes.submit} type="register" onClick={this.register}>
                             Register
                         </Button>
                     </form>
