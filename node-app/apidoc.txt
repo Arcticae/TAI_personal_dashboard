@@ -17,6 +17,11 @@
   // @access Private
   // @header <token>
 
+  // @path DELETE /api/memos/memo/
+  // @desc Delete memo with specific id
+  // @access Private
+  // @header <token>
+  // @params <id>
 
   //// TODOLIST
 
@@ -43,13 +48,21 @@
   // @access Private
   // @header <token>
 
+  // @path DELETE /api/memos/todolist
+  // @desc Delete todolist with given id
+  // @access Private
+  // @header <token>
+  // @body <id>
+
+
+
   //// EVENTS
 
   // @path POST /api/timeline/event
   // @desc Add the event to your "dashboard"
   // @access Private
   // @header <token>
-  // @body <header> <time> ~<content>
+  // @body <header> <date> ~<content>
 
   // @path GET /api/timeline/event/
   // @desc Get event with specific id
@@ -61,6 +74,12 @@
   // @desc Get all event's id's and headers
   // @access Private
   // @header <token>
+
+  // @path DELETE /api/timeline/event
+  // @desc Delete an event and corresponding reminders
+  // @access Private
+  // @header <token>
+  // @body <id>
 
   //// REMINDERS
 
@@ -81,6 +100,12 @@
   // @desc Get all user's reminders
   // @access Private
   // @header <token>
+
+  // @path DELETE /api/timeline/reminder
+  // @desc Delete reminder with specified id
+  // @access Private
+  // @header <token>
+  // @body <id>
 
   //// USER 
   
