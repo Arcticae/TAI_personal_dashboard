@@ -15,7 +15,7 @@ module.exports = app => {
     app.model.token
       .findOneAndDelete({ value: token })
       .then(_ => {
-        return res.status(200).json({ token: "OK" });
+        return res.status(204).json({});
       })
       .catch(err => {
         console.log(err);
