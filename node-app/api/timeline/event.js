@@ -139,5 +139,70 @@ module.exports = app => {
         return req.status(404).json({ reason: "Database error" });
       });
   });
+  // @path DELETE /api/timeline/event
+  // @desc Delete an event and corresponding reminders
+  // @access Private
+  // @header <token>
+  // @body <id>
+  router.delete("/event", app.middlewares.loginRedirect, (req, res) => {
+    const Event = app.model.event;
+    const User = app.model.user;
+    const Reminder = app.model.reminder;
+    const { id } = req.body;
+
+    if (isEmpty(req.headers.token)) {
+      return res
+        .status(400)
+        .json({ token: "No API token provided in the headers" });
+    }
+    User.findByToken(req.headers.token)
+      .then(user => {
+        if (user) {
+          Event.findOne({ owner: user._id, _id: id })
+            .then(event => {
+              if (event) {
+                for (reminder_id of event.reminders) {
+                  Reminder.findOneAndDelete({
+                    _id: reminder_id,
+                    owner: user._id
+                  })
+                    .then(_ => {})
+                    .catch(err => {
+                      console.log(err);
+                      return res
+                        .status(404)
+                        .json({ reason: "Database unavailable" });
+                    });
+                  //Delete the event
+                  Event.deleteOne({ owner: user._id, _id: event._id })
+                    .then(_ => {
+                      return res.status(204).json({});
+                    })
+                    .catch(err => {
+                      console.log(err);
+                      return res
+                        .status(404)
+                        .json({ reason: "Database unavailable" });
+                    });
+                }
+              } else {
+                return res
+                  .status(404)
+                  .json({ id: "Event of that id not found" });
+              }
+            })
+            .catch(err => {
+              console.log(err);
+              return res.status(404).json({ reason: "Database unavailable" });
+            });
+        } else {
+          return req.status(401).json({ reason: "Unauthorized" });
+        }
+      })
+      .catch(err => {
+        console.log(err);
+        return req.status(404).json({ reason: "Database error" });
+      });
+  });
   return router;
 };

@@ -74,11 +74,6 @@ module.exports = app => {
     if (isEmpty(memoId)) {
       return res.status(400).json({ id: "No memo id given" });
     }
-    if (isEmpty(req.headers.token)) {
-      return res
-        .status(400)
-        .json({ token: "No API token provided in the headers" });
-    }
     User.findByToken(req.headers.token)
       .then(user => {
         if (!isEmpty(user)) {
@@ -131,6 +126,39 @@ module.exports = app => {
       .catch(err => {
         console.log(err);
         return res.status(404).json({ reason: "Database error" });
+      });
+  });
+  // @path DELETE /api/memos/memo/
+  // @desc Delete memo with specific id
+  // @access Private
+  // @header <token>
+  // @params <id>
+  router.delete("/memo", app.middlewares.loginRedirect, (req, res) => {
+    const Memo = app.model.memo;
+    const User = app.model.user;
+    const memoId = req.body.id;
+
+    if (isEmpty(memoId)) {
+      return res.status(400).json({ id: "No memo id given" });
+    }
+    User.findByToken(req.headers.token)
+      .then(user => {
+        if (!isEmpty(user)) {
+          Memo.deleteOne({ owner: user._id, _id: memoId })
+            .then(_ => {
+              return res.status(204).json({});
+            })
+            .catch(err => {
+              console.log(err);
+              return res.status(404).json({ reason: "Database unavailable" });
+            });
+        } else {
+          return req.status(401).json({ reason: "Unauthorized" });
+        }
+      })
+      .catch(err => {
+        console.log(err);
+        return res.status(404).json({ reason: "Database unavailable" });
       });
   });
   return router;
