@@ -27,7 +27,7 @@ module.exports = app => {
       return res.status(400).json(errors);
     }
 
-    User.findOne({ email: email }).exec((err, user) => {
+    User.findOne({ email: email, deleted: false }).exec((err, user) => {
       if (err) {
         return res.status(404).json({
           reason: "Database user search error"
@@ -55,12 +55,12 @@ module.exports = app => {
           });
         } else {
           return res.status(401).json({
-            password: "Wrong password"
+            password: "Incorrect password"
           });
         }
       } else {
         return res.status(404).json({
-          email: "Wrong username"
+          email: "Incorrect email"
         });
       }
     });
@@ -70,7 +70,7 @@ module.exports = app => {
   // @desc Retrieve the user's data, according to given token
   // @access Private
   // @headers <token>
-  router.get("/", (req, res) => {
+  router.get("/", app.middlewares.loginRedirect, (req, res) => {
     const token = req.headers.token;
     const User = app.model.user;
     if (isEmpty(token)) {
@@ -82,6 +82,32 @@ module.exports = app => {
       .then(tokenOwner => {
         if (!isEmpty(tokenOwner)) {
           return res.json(tokenOwner);
+        } else {
+          return res
+            .status(404)
+            .json({ token: "Owner of that token was not found in database" });
+        }
+      })
+      .catch(err => {
+        console.log(err);
+        return res.status(404).json({ reason: "Database error" });
+      });
+  });
+  // @path DELETE /api/user/
+  // @desc Delete the user's account, according to given token
+  // @access Private
+  // @headers <token>
+  router.delete("/", app.middlewares.loginRedirect, (req, res) => {
+    const token = req.headers.token;
+    const User = app.model.user;
+    User.findByToken(token)
+      .then(tokenOwner => {
+        if (!isEmpty(tokenOwner)) {
+          tokenOwner.deleted = true;
+          tokenOwner.save(err => {
+            if (err) return res.status(404).json({ reason: "Database error" });
+            else return res.status(204).json({});
+          });
         } else {
           return res
             .status(404)

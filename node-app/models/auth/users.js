@@ -12,6 +12,10 @@ module.exports = app => {
     email: {
       type: String,
       required: true
+    },
+    deleted: {
+      type: Boolean,
+      required: true
     }
   });
 
@@ -21,7 +25,7 @@ module.exports = app => {
     if (!isEmpty(dbToken)) {
       const user = await app.mongoose
         .model("user")
-        .findOne({ _id: dbToken.owner })
+        .findOne({ _id: dbToken.owner, deleted: false })
         .exec();
       if (!isEmpty(user)) {
         return user;

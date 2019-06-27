@@ -46,7 +46,8 @@ module.exports = app => {
             username,
             //FIXME: store the password as MD5 or sth
             password,
-            email
+            email,
+            deleted: false
           });
           newUser.save(error => {
             if (error) {
