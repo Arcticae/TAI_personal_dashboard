@@ -33,12 +33,15 @@ services:
     restart: always
     container_name: mongodb
     volumes:
-      - ./data-node:/data/db
+      - mongodata:/data/db
     ports:
-      - 27017:27017
+      - "27017:27017"
     command: mongod --noauth --smallfiles
     networks:
       - webappnetwork
 networks:
   webappnetwork:
     driver: bridge
+
+volumes:
+  mongodata: {}

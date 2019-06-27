@@ -1,33 +1,63 @@
-const mongoose = require('mongoose');
-const express = require('express');
-const bodyParser = require('body-parser');
-const expressSession = require('express-session');
+const utils = require("./utils");
 
-const { 
-    SESS_TIMEOUT = 10,
-    APP_PORT = 6969
-} = process.env;
-
+const express = require("express");
+const schedule = require("node-schedule");
 const app = express();
-const router = express.Router();
+// const morgan = require("morgan");
+app.mongoose = require("mongoose");
 
-//put our middlewares into app object
-//app.middlewares = require('./middlewares');
-//use cookie session with expiration time
-app.use(expressSession({
-    name: 'session-id',
-    cookie: {
-        maxAge:  SESS_TIMEOUT * 60 * 1000,
-        secure: true 
-    },
-    secret: 'lmao'
-}));
+app.use(express.json({ extended: true })); // to support JSON-encoded bodies
+// app.use(morgan("dev"));
 
-app.get('/', (req, res) => {
-    console.log(`res sent`);
-    res.send('response from node');
-});
+const NODE_ENV = process.env.NODE_ENV.trim() || "dev"; // ten trim jest po chuj
+const config = {
+  mongoDBPath: `mongodb://${
+    NODE_ENV === "dev" ? "localhost" : "mongodb"
+  }:27017/node-app-db`,
+  SESS_TIMEOUT: 10,
+  APP_PORT: 6969,
+  dbConnectionOptions: {
+    useNewUrlParser: true,
+    autoIndex: process.env.NODE_ENV === "dev",
+    reconnectInterval: 1000 //miliseconds
+  }
+};
+app.config = config;
+app.mongoose
+  .connect(app.config.mongoDBPath, app.config.dbConnectionOptions)
+  .then(() => {
+    start_app();
+  })
+  .catch(err => {
+    console.log("[ERROR] Error while connecting to MONGODB instance." + err);
+  });
 
-app.listen(APP_PORT, () => {
-    console.log(`App is listening on port ${APP_PORT}`);
-});
+//Middlewares
+app.middlewares = require("./middlewares")(app);
+//Models
+app.model = require("./models")(app);
+//Routes
+app.use("/api", require("./api")(app));
+
+function start_app() {
+  //TODO: move scheduled jobs somewhere?
+  //schedule some jobs here, like automatic removing revoked tokens from db
+  schedule.scheduleJob(` */${app.config.SESS_TIMEOUT} * * * * `, () => {
+    console.log("[INFO] Scheduled revoked tokens removal is in process");
+
+    app.model.token
+      .deleteMany({
+        valid_to: { $lt: new Date(Date.now()) }
+      })
+      .exec((error, _) => {
+        if (error)
+          console.log(
+            "[ERROR] Something went wrong with execution of scheduled token removal"
+          );
+      });
+  });
+
+  app.listen(config.APP_PORT, () => {
+    console.log(`App is listening on port ${config.APP_PORT}`);
+  });
+}
