@@ -26,41 +26,41 @@ module.exports = app => {
     }
     //TODO: jesus fucking christ remove this async
     email = email.toLowerCase();
-    User.findOne({ $or: [{ email }, { username }] }).exec(
-      async (err, dbUser) => {
-        if (err) {
-          return res.status(404).json({
-            reason: "Database unavailable"
-          });
-        } else if (dbUser) {
-          const errors = {};
-          if (dbUser.email === email) {
-            errors.email = "User with that e-mail address already exists";
-          }
-          if (dbUser.username === username) {
-            errors.username = "User with that username already exists";
-          }
-          return res.status(400).json(errors);
-        } else {
-          let newUser = new User({
-            username,
-            //FIXME: store the password as MD5 or sth
-            password,
-            email,
-            deleted: false
-          });
-          newUser.save(error => {
-            if (error) {
-              return res.status(404).json({
-                reason: "Database threw an error while saving user info"
-              });
-            } else {
-              return res.json(newUser);
-            }
-          });
+    User.findOne({
+      $and: [{ $or: [{ email }, { username }] }, { deleted: false }]
+    }).exec(async (err, dbUser) => {
+      if (err) {
+        return res.status(404).json({
+          reason: "Database unavailable"
+        });
+      } else if (dbUser) {
+        const errors = {};
+        if (dbUser.email === email) {
+          errors.email = "User with that e-mail address already exists";
         }
+        if (dbUser.username === username) {
+          errors.username = "User with that username already exists";
+        }
+        return res.status(400).json(errors);
+      } else {
+        let newUser = new User({
+          username,
+          //FIXME: store the password as MD5 or sth
+          password,
+          email,
+          deleted: false
+        });
+        newUser.save(error => {
+          if (error) {
+            return res.status(404).json({
+              reason: "Database threw an error while saving user info"
+            });
+          } else {
+            return res.json(newUser);
+          }
+        });
       }
-    );
+    });
   });
   return router;
 };

@@ -75,11 +75,7 @@ module.exports = app => {
     if (isEmpty(eventId)) {
       return res.status(400).json({ id: "No event id given" });
     }
-    if (isEmpty(req.headers.token)) {
-      return res
-        .status(400)
-        .json({ token: "No API token provided in the headers" });
-    }
+
     User.findByToken(req.headers.token)
       .then(user => {
         if (!isEmpty(user)) {
