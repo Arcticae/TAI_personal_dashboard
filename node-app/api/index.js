@@ -14,6 +14,7 @@ module.exports = app => {
   router.use("/memos", require("./memos/todolist")(app));
   //Google api routes
   router.use("/googleCalendar/auth", require("./googleCalendar/auth")(app));
-  router.use("/googleCalendar", require("./googleCalendar/event")(app));
+  router.use("/googleCalendar/event", require("./googleCalendar/event")(app));
+
   return router;
 };

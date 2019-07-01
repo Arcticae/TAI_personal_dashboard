@@ -35,14 +35,9 @@ const getAuthorizationLink = oAuth2Client =>
 
 //Authorize client based on code returned from user's input
 // Returns promise
-const getClientToken = async (oAuth2Client, accessCode) =>
-  oAuth2Client.getToken(accessCode, (err, token) => {
-    if (err) {
-      console.log("Error retrieving token: " + err);
-      return null;
-    }
-    return token;
-  });
+const getClientToken = async (oAuth2Client, accessCode) => {
+  return await oAuth2Client.getToken(accessCode);
+};
 //Authorize client with token
 const authorizeClient = (oAuth2Client, googleToken) => {
   oAuth2Client.setCredentials(googleToken);

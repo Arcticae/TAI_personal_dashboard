@@ -1,29 +1,37 @@
 const { google } = require("googleapis");
 //List of 10 nearest upcoming events
-module.exports = async oAuth2Client => {
-  const calendar = google.calendar({ version: "v3", oAuth2Client });
-  calendar.events.list(
-    {
+module.exports = async (auth, ahead) => {
+  const calendar = google.calendar({ version: "v3", auth });
+
+  return calendar.events
+    .list({
       calendarId: "primary",
       timeMin: new Date().toISOString(),
-      maxResults: 10,
+      maxResults: ahead,
       singleEvents: true,
       orderBy: "startTime"
-    },
-    (err, res) => {
-      if (err) {
-        console.log("API request to calendar returned an error: " + err);
-        return null;
-      }
-      const events = res.data.items;
-      if (events.length) {
-        return events;
+    })
+    .then(res => {
+      if (res) {
+        return res.data.items.map(event => {
+          return {
+            header: event.summary,
+            date: new Date(event.start.date || event.start.dateTime),
+            reminders: event.reminders.overrides.map(
+              reminder =>
+                new Date(
+                  new Date(event.start.date || event.start.dateTime) -
+                    reminder.minutes * 60000
+                )
+            )
+          };
+        });
       } else {
-        //TODO: what does this mean?
-        console.log("Events.length not gud?");
-        console.log(events);
         return null;
       }
-    }
-  );
+    })
+    .catch(err => {
+      console.log(err);
+      throw err;
+    });
 };

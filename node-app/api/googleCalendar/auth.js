@@ -27,9 +27,8 @@ module.exports = app => {
             .getClientToken(oAuth2Client, accessCode)
             .then(token => {
               if (token) {
-                console.log("Got the google token: " + token);
-                token = JSON.stringify(token);
-                newGoogleToken = new GoogleToken({
+                token = token.res.data;
+                const newGoogleToken = new GoogleToken({
                   token,
                   owner: user._id
                 });
