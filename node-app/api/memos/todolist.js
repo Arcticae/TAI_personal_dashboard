@@ -81,7 +81,6 @@ module.exports = app => {
   // @access Private
   // @header <token>
   // @body <id> <content>
-  //TODO: Implement validation of parameters
   router.put("/todolist", app.middlewares.loginRedirect, (req, res) => {
     const User = app.model.user;
     const ToDoList = app.model.todolist;
@@ -148,7 +147,7 @@ module.exports = app => {
   // @desc Get todolist's content
   // @access Private
   // @header <token>
-  // @body <id> <content>
+  // @body <id>
   router.get("/todolist", app.middlewares.loginRedirect, (req, res) => {
     const User = app.model.user;
     const ToDoList = app.model.todolist;
@@ -218,6 +217,42 @@ module.exports = app => {
         return res.status(404).json({ reason: "Database error" });
       });
   });
+  // @path DELETE /api/memos/todolist
+  // @desc Delete todolist with given id
+  // @access Private
+  // @header <token>
+  // @body <id>
+  router.delete("/todolist", app.middlewares.loginRedirect, (req, res) => {
+    const User = app.model.user;
+    const ToDoList = app.model.todolist;
 
+    const { id } = req.body;
+    const errors = {};
+    if (isEmpty(id)) {
+      errors.id = "id field is required";
+    }
+    if (!isEmpty(errors)) {
+      return res.status(400).json(errors);
+    }
+    User.findByToken(req.headers.token)
+      .then(user => {
+        if (!isEmpty(user)) {
+          ToDoList.deleteOne({ _id: id, owner: user._id })
+            .then(_ => {
+              return res.status(204).json({});
+            })
+            .catch(err => {
+              console.log(err);
+              return res.status(404).json({ reason: "Database error" });
+            });
+        } else {
+          return res.status(401).json({ reason: "Unauthorized" });
+        }
+      })
+      .catch(err => {
+        console.log(err);
+        return res.status(404).json({ reason: "Database error" });
+      });
+  });
   return router;
 };

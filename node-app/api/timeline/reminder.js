@@ -102,7 +102,7 @@ module.exports = app => {
   // @desc Get all event's reminders
   // @access Private
   // @header <token>
-  // @body <event_id>
+  // @body <id>
   router.get("/event/reminder", app.middlewares.loginRedirect, (req, res) => {
     const Event = app.model.event;
     const User = app.model.user;
@@ -153,6 +153,54 @@ module.exports = app => {
             })
             .catch(() => {
               return res.status(404).json({ reason: "Database unavailable" });
+            });
+        } else {
+          return req.status(401).json({ reason: "Unauthorized" });
+        }
+      })
+      .catch(err => {
+        console.log(err);
+        return req.status(404).json({ reason: "Database error" });
+      });
+  });
+  // @path DELETE /api/timeline/reminder
+  // @desc Delete reminder with specified id, and it's related event
+  // @access Private
+  // @header <token>
+  // @body <id>
+  router.delete("/reminder", app.middlewares.loginRedirect, (req, res) => {
+    const User = app.model.user;
+    const Reminder = app.model.reminder;
+    const Event = app.model.event;
+    const { id } = req.body;
+
+    User.findByToken(req.headers.token)
+      .then(user => {
+        if (user) {
+          Reminder.deleteOne({ owner: user._id, _id: id }, err => {
+            if (err) {
+              return res.status(404).json({ reason: "Database error" });
+            }
+          });
+          //Delete references in events
+          Event.findOne({
+            owner: user._id,
+            reminders: { $elemMatch: { $eq: id } }
+          })
+            .then(event => {
+              event.remiders = event.reminders.filter(v => v != id);
+              event.save(err => {
+                if (err) {
+                  console.log(err);
+                  return res.status(404).json({ reason: "Database error" });
+                } else {
+                  return res.status(204).json();
+                }
+              });
+            })
+            .catch(err => {
+              console.log(err);
+              return res.status(404).json({ reason: "Database error" });
             });
         } else {
           return req.status(401).json({ reason: "Unauthorized" });

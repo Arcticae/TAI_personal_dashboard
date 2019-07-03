@@ -1,20 +1,27 @@
+  //// MEMOS
+
   // @path POST /api/memos/memo
   // @desc Add the memo to your "dashboard"
   // @access Private
   // @header <token>
-  // @body <header> <time> ~<content>
+  // @body <header> ~<content>
 
-  // @path GET /api/memos/memo/:id
+  // @path GET /api/memos/memo/
   // @desc Get memo with specific id
   // @access Private
   // @header <token>
-  // @params <id>
+  // @body <id>
 
   // @path GET /api/memos/memo/all
   // @desc Get all memo's id's and headers
   // @access Private
   // @header <token>
 
+  // @path DELETE /api/memos/memo/
+  // @desc Delete memo with specific id
+  // @access Private
+  // @header <token>
+  // @params <id>
 
   //// TODOLIST
 
@@ -25,7 +32,7 @@
   // @body <header> ~<content: [{ done: Boolean, content: String}]>
 
   // @path PUT /api/memos/todolist
-  // @desc Modify todolist with content
+  // @desc Modify todolist with content (overwrites old one)
   // @access Private
   // @header <token>
   // @body <id> <content>
@@ -34,12 +41,20 @@
   // @desc Get todolist's content
   // @access Private
   // @header <token>
-  // @body <id> <content>
+  // @body <id>
   
   // @path GET /api/memos/todolist/all
   // @desc Get id's and headers of all your todolists
   // @access Private
   // @header <token>
+
+  // @path DELETE /api/memos/todolist
+  // @desc Delete todolist with given id
+  // @access Private
+  // @header <token>
+  // @body <id>
+
+
 
   //// EVENTS
 
@@ -47,18 +62,24 @@
   // @desc Add the event to your "dashboard"
   // @access Private
   // @header <token>
-  // @body <header> <time> ~<content>
+  // @body <header> <date> ~<content>
 
-  // @path GET /api/timeline/event/:id
+  // @path GET /api/timeline/event/
   // @desc Get event with specific id
   // @access Private
   // @header <token>
-  // @params <id>
+  // @body <id>
 
   // @path GET /api/timeline/event/all
   // @desc Get all event's id's and headers
   // @access Private
   // @header <token>
+
+  // @path DELETE /api/timeline/event
+  // @desc Delete an event and corresponding reminders
+  // @access Private
+  // @header <token>
+  // @body <id>
 
   //// REMINDERS
 
@@ -66,23 +87,27 @@
   // @desc Add list of dates (reminders), and binds it to an event optionally
   // @access Private
   // @header <token>
-  // @body <times:[Date]> ~<eventId>
+  // @body <content:[{Date,String}]> ~<eventId>
 
 
-  // @path GET /api/timeline/event/:id/reminder
-  // @desc Get all event's reminders
+  // @path GET /api/timeline/event/reminder
+  // @desc Get all event's (id) reminders
   // @access Private
   // @header <token>
-  // @params <event_id>
+  // @body <id>
 
-   // @path GET /api/timeline/reminder
+  // @path GET /api/timeline/reminder/all
   // @desc Get all user's reminders
   // @access Private
   // @header <token>
-  // @params <id>
+
+  // @path DELETE /api/timeline/reminder
+  // @desc Delete reminder with specified id
+  // @access Private
+  // @header <token>
+  // @body <id>
 
   //// USER 
-
   
   // @path POST /api/user/login
   // @desc Log in the user and retrieve the token
@@ -98,6 +123,12 @@
   // @desc Register the user and retrieve the token
   // @access Public
   // @body <email> <password> <username>
+  
+  // @path POST /api/user/logout
+  // @desc Log out the user (revoke the token from the header)
+  // @access Private
+  // @header <token>
+  // @body <token>
 
   
   //// GOOGLEAPI 
@@ -118,3 +149,5 @@
   // @header <token>
   // @body <ahead>
   // Response: [{ header: <String> , date: <Date> , reminders: [ <Date> ] }]
+
+
