@@ -123,9 +123,31 @@
   // @desc Register the user and retrieve the token
   // @access Public
   // @body <email> <password> <username>
-
+  
   // @path POST /api/user/logout
   // @desc Log out the user (revoke the token from the header)
   // @access Private
   // @header <token>
   // @body <token>
+
+  
+  //// GOOGLEAPI 
+
+  // @path GET /api/googleCalendar/auth
+  // @desc Get link for permission to edit google calendar
+  // @access Public
+
+  // @path POST /api/googleCalendar/auth
+  // @desc Post code to authorize this app to use user's calendars
+  // @access Private
+  // @header <token>
+  // @body <accessCode>
+
+  // @path GET /api/googleCalendar/event/
+  // @desc Get "ahead" of events from user's calendar
+  // @access Private
+  // @header <token>
+  // @body <ahead>
+  // Response: [{ header: <String> , date: <Date> , reminders: [ <Date> ] }]
+
+

@@ -6,11 +6,12 @@ module.exports = app => {
   const todolist = require("./memos/todolist")(app);
   const event = require("./timeline/event")(app);
   const reminder = require("./timeline/reminder")(app);
-
+  const googleToken = require("./auth/googleToken")(app);
   return {
     //auth
     user,
     token,
+    googleToken,
     //memo
     memo,
     todolist,

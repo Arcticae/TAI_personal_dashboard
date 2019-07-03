@@ -26,44 +26,47 @@ module.exports = app => {
     if (!isEmpty(errors)) {
       return res.status(400).json(errors);
     }
+    User.findOne({ email, deleted: false })
+      .then(user => {
+        if (user) {
+          if (user.password === password) {
+            let token = hashToken(16);
+            let timeout = app.config.SESS_TIMEOUT * 60000;
+            let validTo = new Date(Date.now() + timeout);
 
-    User.findOne({ email: email, deleted: false }).exec((err, user) => {
-      if (err) {
-        return res.status(404).json({
-          reason: "Database user search error"
-        });
-      } else if (user) {
-        if (user.password === password) {
-          let token = hashToken(16);
-          let timeout = app.config.SESS_TIMEOUT * 60000;
-          let validTo = new Date(Date.now() + timeout);
+            const newToken = new Token({
+              value: token,
+              valid_to: validTo,
+              owner: user._id
+            });
 
-          const newToken = new Token({
-            value: token,
-            valid_to: validTo,
-            owner: user._id
-          });
-
-          newToken.save(error => {
-            if (error) {
-              return res.status(404).json({
-                reason: "Database session save error"
-              });
-            } else {
-              return res.json({ token });
-            }
-          });
+            newToken.save(error => {
+              if (error) {
+                return res.status(404).json({
+                  reason: "Database session save error"
+                });
+              } else {
+                return res.json({ token });
+              }
+            });
+          } else {
+            return res.status(401).json({
+              password: "Incorrect password"
+            });
+          }
         } else {
-          return res.status(401).json({
-            password: "Incorrect password"
+          return res.status(404).json({
+            email: "Incorrect email"
           });
         }
-      } else {
-        return res.status(404).json({
-          email: "Incorrect email"
-        });
-      }
-    });
+      })
+      .catch(err => {
+        if (err) {
+          return res.status(404).json({
+            reason: "Database user search error"
+          });
+        }
+      });
   });
 
   // @path GET /api/user/
