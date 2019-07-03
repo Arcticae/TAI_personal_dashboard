@@ -1,8 +1,6 @@
-const oAuth2 = require("./oAuth2");
-const fetchEvents = require("./fetchEvents");
-const fetchReminders = require("./fetchReminders");
+const oAuth2 = require('./oAuth2');
+const fetchEvents = require('./fetchEvents');
 module.exports = {
   oAuth2,
-  fetchEvents,
-  fetchReminders
+  fetchEvents
 };

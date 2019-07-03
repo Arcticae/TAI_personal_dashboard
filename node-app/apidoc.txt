@@ -10,7 +10,7 @@
   // @header <token>
   // @params <id>
 
-   // @path GET /api/memos/memo/all
+  // @path GET /api/memos/memo/all
   // @desc Get all memo's id's and headers
   // @access Private
   // @header <token>
@@ -98,3 +98,23 @@
   // @desc Register the user and retrieve the token
   // @access Public
   // @body <email> <password> <username>
+
+  
+  //// GOOGLEAPI 
+
+  // @path GET /api/googleCalendar/auth
+  // @desc Get link for permission to edit google calendar
+  // @access Public
+
+  // @path POST /api/googleCalendar/auth
+  // @desc Post code to authorize this app to use user's calendars
+  // @access Private
+  // @header <token>
+  // @body <accessCode>
+
+  // @path GET /api/googleCalendar/event/
+  // @desc Get "ahead" of events from user's calendar
+  // @access Private
+  // @header <token>
+  // @body <ahead>
+  // Response: [{ header: <String> , date: <Date> , reminders: [ <Date> ] }]
