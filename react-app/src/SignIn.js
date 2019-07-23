@@ -32,7 +32,7 @@ const styles = theme => ({
         marginTop: theme.spacing.unit,
     },
     submit: {
-        marginTop: theme.spacing.unit * 3,
+        marginTop: theme.spacing.unit * 2,
     },
 });
 
@@ -44,10 +44,15 @@ class SignIn extends Component{
         username: "",
         password: "",
         error: false,
+        registerSuccess: false
     };
 
     handleLoginError = () => {
-        this.state.error = true;
+        this.setState({error: true});
+    }
+
+    handleRegisterSuccess = () => {
+        this.setState({registerSuccess: true});
     }
 
     fetchUserAndRedirect(token){
@@ -66,11 +71,11 @@ class SignIn extends Component{
 
     handleChange = event => {
         this.setState({
-            [event.target.id]: event.target.value
+            [event.currentTarget.id]: event.currentTarget.value
         });
     };
 
-    submit = () => {
+    submit = event => {
         this.state.error = false;
         console.log(`Signing in with ${this.state.username}:${this.state.password}`);
         api.fetchHandleError(
@@ -83,13 +88,23 @@ class SignIn extends Component{
         )
     };
 
-    register(){
-        // TODO zesraj sie
+    register = event => {
+        this.state.error = false;
+        this.state.registerSuccess = true;
+        console.log(`Registering with ${this.state.username}:${this.state.password}`);
+        api.fetchHandleError(
+            api.endpoints.register(this.state.username, this.state.password),
+            (response) => {
+                // todo what
+            },
+            this.handleRegisterSuccess.bind(this)
+        )
     };
 
     render() {
         const {classes} = this.props;
-        const {error} = this.state;
+        const {error} = this.state.error;
+        const {registerSuccess} = this.state.registerSuccess;
 
         if(signedIn())
             return (<Redirect to={{pathname: "/dashboard"}}/>);
@@ -102,9 +117,12 @@ class SignIn extends Component{
                     </Typography>
                     {error &&
                     <Typography color="secondary">Incorrect mail or password</Typography>
+                    }<br />
+                    {registerSuccess &&
+                    <Typography color="primary">Registered successfully</Typography>
                     }
                     <br /><br/>
-                    <form onSubmit={this.submit}>
+                    <form>
                         <label>
                             <Typography component="h4">
                                 Username: <input id="username" type="username" value={this.state.username} onChange={this.handleChange} />
@@ -115,10 +133,10 @@ class SignIn extends Component{
                                 Password: <input id="password" type="password" value={this.state.password} onChange={this.handleChange} />
                             </Typography>
                         </label><br />
-                        <Button fullWidth variant="contained" color="primary" className={classes.submit} type="submit" onClick={this.submit}>
+                        <Button fullWidth variant="contained" color="primary" className={classes.submit} onClick={this.submit}>
                             Sign in
                         </Button>
-                        <Button fullWidth variant="outlined" color="primary" className={classes.submit} type="register" onClick={this.register}>
+                        <Button fullWidth variant="outlined" color="primary" className={classes.submit} onClick={this.register}>
                             Register
                         </Button>
                     </form>
