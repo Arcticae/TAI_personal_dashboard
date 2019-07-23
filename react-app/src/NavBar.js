@@ -16,8 +16,14 @@ const styles = (theme => ({
 
 class NavBar extends Component{
 
+    signedIn = () => {return true;} // todo unmock
+
+    handleSignIn = () => {}
+    handleSignOut = () => {}
+
     render() {
         const {classes} = this.props;
+
         return (
             <div className={classes.root}>
        <AppBar position="static">
@@ -25,7 +31,10 @@ class NavBar extends Component{
            <Typography color="inherit" variant="h6" className={classes.title}>
              Personal Dashboard
            </Typography>
-           <Button color="inherit">Sign in</Button>
+           {this.signedIn()
+            ? <Button color="inherit" onClick={this.handleSignOut}>Sign out</Button> // username maybe?
+            : <Button color="inherit" onClick={this.handleSignIn}>Sign in</Button>
+           }
          </Toolbar>
        </AppBar>
      </div>
