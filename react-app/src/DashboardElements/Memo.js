@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {withStyles} from '@material-ui/core/styles/index';
-import { Typography, Button, TextField } from '@material-ui/core';
+import { Button, TextField } from '@material-ui/core';
 import './memo.css'
 
 const styles = (theme) => ({
@@ -22,8 +22,8 @@ const styles = (theme) => ({
 
 class Memo extends Component {
     state = {
-        text: 'xd',
-        edit: false,
+        text: this.props.text,
+        edit: this.props.edit,
         confirmDelete: false
     };
 
@@ -38,9 +38,7 @@ class Memo extends Component {
 
     handleDelete = () => {this.setState({confirmDelete: true});}
     handleCancelDelete = () => {this.setState({confirmDelete: false});}
-    handleConfirmDelete = () => {
-        // todo delete
-    }
+    handleConfirmDelete = () => {console.log(this.props.id); this.props.onDelete(this.props.id);}
 
     handleChange = event => {
         this.setState({text: event.currentTarget.value})
