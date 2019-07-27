@@ -32,7 +32,7 @@ const styles = theme => ({
         marginTop: theme.spacing.unit,
     },
     submit: {
-        marginTop: theme.spacing.unit * 3,
+        marginTop: theme.spacing.unit * 2,
     },
 });
 
@@ -83,8 +83,24 @@ class SignIn extends Component{
         )
     };
 
-    register(){
-        // TODO zesraj sie
+    register = () => {
+        const {name, password} = this.state;
+
+        const data = {
+            username: 'whatever',
+            password: password,
+            email: name
+        };
+        console.log(`Registering with ${this.state.username}:${this.state.password}`);
+        api.fetch(
+            api.endpoints.register(data),
+            (user) => {
+                this.setState({
+                    name: '',
+                    password: ''
+                })
+            }
+        );
     };
 
     render() {
@@ -106,19 +122,19 @@ class SignIn extends Component{
                     <br /><br/>
                     <form onSubmit={this.submit}>
                         <label>
-                            <Typography component="h4">
-                                Username: <input id="username" type="username" value={this.state.username} onChange={this.handleChange} />
+                            <Typography component="h4" align="right">
+                               Email: <input id="username" type="username" value={this.state.username} onChange={this.handleChange} />
                             </Typography>
                         </label><br/>
                         <label>
-                            <Typography component="h4">
+                            <Typography component="h4" align="right">
                                 Password: <input id="password" type="password" value={this.state.password} onChange={this.handleChange} />
                             </Typography>
                         </label><br />
-                        <Button fullWidth variant="contained" color="primary" className={classes.submit} type="submit" onClick={this.submit}>
+                        <Button fullWidth variant="contained" color="primary" className={classes.submit} onClick={this.submit}>
                             Sign in
                         </Button>
-                        <Button fullWidth variant="outlined" color="primary" className={classes.submit} type="register" onClick={this.register}>
+                        <Button fullWidth variant="outlined" color="primary" className={classes.submit} onClick={this.register}>
                             Register
                         </Button>
                     </form>
