@@ -1,6 +1,7 @@
 const host = "localhost";
 const port = 6969;
 const url = endpoint => `http://${host}:${port}/api/${endpoint}`;
+//'content-type': 'application/json'
 
 export default {
 
@@ -9,7 +10,7 @@ export default {
             method: opt.method,
             body: opt.body,
             headers: opt.headers,
-            credentials: 'include'
+            // credentials: 'include'
         })
             .then(res => res.json())
             .then(response => {
@@ -22,7 +23,7 @@ export default {
             method: opt.method,
             body: opt.body,
             headers: opt.headers,
-            credentials: 'include'
+            // credentials: 'include'
         })
             .then(response => {
             action(response);
@@ -34,7 +35,7 @@ export default {
             method: opt.method,
             body: opt.body,
             headers: opt.headers,
-            credentials: 'include'
+            // credentials: 'include'
         })
             .then(res => res.json())
             .then(response => {

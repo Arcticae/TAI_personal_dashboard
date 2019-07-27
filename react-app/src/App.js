@@ -5,7 +5,7 @@ import SignIn from "./SignIn";
 import NavBar from "./NavBar";
 
 function signedIn() {
-    return true;    // TODO unmock
+    return false;    // TODO unmock
 }
 
 const RootRouter = () => {

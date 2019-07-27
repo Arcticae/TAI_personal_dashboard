@@ -44,15 +44,10 @@ class SignIn extends Component{
         username: "",
         password: "",
         error: false,
-        registerSuccess: false
     };
 
     handleLoginError = () => {
-        this.setState({error: true});
-    }
-
-    handleRegisterSuccess = () => {
-        this.setState({registerSuccess: true});
+        this.state.error = true;
     }
 
     fetchUserAndRedirect(token){
@@ -71,11 +66,11 @@ class SignIn extends Component{
 
     handleChange = event => {
         this.setState({
-            [event.currentTarget.id]: event.currentTarget.value
+            [event.target.id]: event.target.value
         });
     };
 
-    submit = event => {
+    submit = () => {
         this.state.error = false;
         console.log(`Signing in with ${this.state.username}:${this.state.password}`);
         api.fetchHandleError(
@@ -88,23 +83,29 @@ class SignIn extends Component{
         )
     };
 
-    register = event => {
-        this.state.error = false;
-        this.state.registerSuccess = true;
+    register = () => {
+        const {name, password} = this.state;
+
+        const data = {
+            username: 'whatever',
+            password: password,
+            email: name
+        };
         console.log(`Registering with ${this.state.username}:${this.state.password}`);
-        api.fetchHandleError(
-            api.endpoints.register(this.state.username, this.state.password),
-            (response) => {
-                // todo what
-            },
-            this.handleRegisterSuccess.bind(this)
-        )
+        api.fetch(
+            api.endpoints.register(data),
+            (user) => {
+                this.setState({
+                    name: '',
+                    password: ''
+                })
+            }
+        );
     };
 
     render() {
         const {classes} = this.props;
-        const {error} = this.state.error;
-        const {registerSuccess} = this.state.registerSuccess;
+        const {error} = this.state;
 
         if(signedIn())
             return (<Redirect to={{pathname: "/dashboard"}}/>);
@@ -117,19 +118,16 @@ class SignIn extends Component{
                     </Typography>
                     {error &&
                     <Typography color="secondary">Incorrect mail or password</Typography>
-                    }<br />
-                    {registerSuccess &&
-                    <Typography color="primary">Registered successfully</Typography>
                     }
                     <br /><br/>
-                    <form>
+                    <form onSubmit={this.submit}>
                         <label>
-                            <Typography component="h4">
-                                Username: <input id="username" type="username" value={this.state.username} onChange={this.handleChange} />
+                            <Typography component="h4" align="right">
+                               Email: <input id="username" type="username" value={this.state.username} onChange={this.handleChange} />
                             </Typography>
                         </label><br/>
                         <label>
-                            <Typography component="h4">
+                            <Typography component="h4" align="right">
                                 Password: <input id="password" type="password" value={this.state.password} onChange={this.handleChange} />
                             </Typography>
                         </label><br />
