@@ -74,10 +74,11 @@ class SignIn extends Component{
         this.state.error = false;
         console.log(`Signing in with ${this.state.username}:${this.state.password}`);
         api.fetchHandleError(
-            api.endpoints.signIn(this.state.username, this.state.password),
+            api.endpoints.signIn({email: this.state.username, password: this.state.password}),
             (response) => {
+                console.log(response);
                 // todo retrieve token from response
-                this.fetchUserAndRedirect(response)
+                // this.fetchUserAndRedirect(response)
             },
             this.handleLoginError.bind(this)
         )
@@ -87,7 +88,7 @@ class SignIn extends Component{
         const {name, password} = this.state;
 
         const data = {
-            username: 'whatever',
+            username: name,
             password: password,
             email: name
         };

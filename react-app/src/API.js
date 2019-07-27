@@ -31,6 +31,7 @@ export default {
     },
 
     fetchHandleError: (opt, action, errorCallback) => {
+        console.log(opt);
         fetch(opt.path, {
             method: opt.method,
             body: opt.body,
@@ -51,19 +52,22 @@ export default {
         register: (data) => ({
             path: url(`user/register`),
             method: "POST",
-            body: JSON.stringify(data)
+            body: JSON.stringify(data),
+            headers: {'Content-Type': 'application/json'}
         }),
 
         signIn: (data) => ({
             path: url(`user/login`),
             method: "POST",
-            body: JSON.stringify(data)
+            body: JSON.stringify(data),
+            headers: {'Content-Type': 'application/json'}
         }),
 
         getUserData: (token) => ({
             path: url(`user`),
             method: "GET",
             headers: {
+                "Content-Type": 'application/json',
                 "token": token
             }
         }),
@@ -72,6 +76,7 @@ export default {
             path: url(`user/logout`),
             method: "POST",
             headers: {
+                "Content-Type": 'application/json',
                 "token": token
             },
             body: token
@@ -83,6 +88,7 @@ export default {
             path: url(`memos/memo`),
             method: "POST",
             headers: {
+                "Content-Type": 'application/json',
                 "token": token
             },
             body: JSON.stringify(data)
@@ -92,6 +98,7 @@ export default {
             path: url(`memos/memo`),
             method: "GET",
             headers: {
+                "Content-Type": 'application/json',
                 "token": token
             },
             body: id
@@ -101,6 +108,7 @@ export default {
             path: url(`memos/memo`),
             method: "DELETE",
             headers: {
+                "Content-Type": 'application/json',
                 "token": token
             },
             body: id
@@ -110,6 +118,7 @@ export default {
             path: url(`memos/memo/all`),
             method: "GET",
             headers: {
+                "Content-Type": 'application/json',
                 "token": token
             }
         }),
@@ -121,6 +130,7 @@ export default {
             path: url(`memos/todolist`),
             method: "POST",
             headers: {
+                "Content-Type": 'application/json',
                 "token": token
             },
             body: JSON.stringify(data)
@@ -130,6 +140,7 @@ export default {
             path: url(`memos/todolist`),
             method: "PUT",
             headers: {
+                "Content-Type": 'application/json',
                 "token": token
             },
             body: JSON.stringify(data)
@@ -139,6 +150,7 @@ export default {
             path: url(`memos/todolist`),
             method: "GET",
             headers: {
+                "Content-Type": 'application/json',
                 "token": token
             },
             body: id
@@ -148,6 +160,7 @@ export default {
             path: url(`memos/todolist`),
             method: "DELETE",
             headers: {
+                "Content-Type": 'application/json',
                 "token": token
             },
             body: id
@@ -157,8 +170,9 @@ export default {
             path: url(`memos/todolist/all`),
             method: "GET",
             headers: {
+                "Content-Type": 'application/json',
                 "token": token
-            }
+            },
         })
     }
 }

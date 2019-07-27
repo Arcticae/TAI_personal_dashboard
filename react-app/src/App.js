@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { Route, Switch, Redirect, BrowserRouter } from 'react-router-dom';
-import Dashboard from "./Dashboard";
-import SignIn from "./SignIn";
-import NavBar from "./NavBar";
+import Dashboard from "./Dashboard.js";
+import SignIn from "./SignIn.js";
+import NavBar from "./NavBar.js";
 
 function signedIn() {
     return false;    // TODO unmock
