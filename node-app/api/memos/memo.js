@@ -61,39 +61,6 @@ module.exports = app => {
         });
     }
   );
-  // @path GET /api/memos/memo/:memoId
-  // @desc Get memo with specific id
-  // @access Private
-  // @header <token>
-  // @params <id>
-  router.get("/memo/:memoId", app.middlewares.loginRedirect, (req, res) => {
-    const Memo = app.model.memo;
-    const User = app.model.user;
-    const memoId = req.params.memoId;
-
-    if (isEmpty(memoId)) {
-      return res.status(400).json({ id: "No memo id given" });
-    }
-    User.findByToken(req.headers.token)
-      .then(user => {
-        if (!isEmpty(user)) {
-          Memo.findOne({ owner: user._id, _id: memoId })
-            .then(memo => {
-              if (memo) return res.json(memo);
-              else return res.status(404).json({ id: "No memo with that id" });
-            })
-            .catch(() => {
-              return res.status(404).json({ reason: "Database unavailable" });
-            });
-        } else {
-          return req.status(401).json({ reason: "Unauthorized" });
-        }
-      })
-      .catch(err => {
-        console.log(err);
-        return res.status(404).json({ reason: "Database unavailable" });
-      });
-  });
   // @path GET /api/memos/memo/all
   // @desc Get all memo's id's and headers
   // @access Private
@@ -128,15 +95,49 @@ module.exports = app => {
         return res.status(404).json({ reason: "Database error" });
       });
   });
+  // @path GET /api/memos/memo/:memoId
+  // @desc Get memo with specific id
+  // @access Private
+  // @header <token>
+  // @params <id>
+  router.get("/memo/:memoId", app.middlewares.loginRedirect, (req, res) => {
+    const Memo = app.model.memo;
+    const User = app.model.user;
+    const memoId = req.params.memoId;
+
+    if (isEmpty(memoId)) {
+      return res.status(400).json({ id: "No memo id given" });
+    }
+    User.findByToken(req.headers.token)
+      .then(user => {
+        if (!isEmpty(user)) {
+          Memo.findOne({ owner: user._id, _id: memoId })
+            .then(memo => {
+              if (memo) return res.json(memo);
+              else return res.status(404).json({ id: "No memo with that id" });
+            })
+            .catch((err) => {
+              return res.status(404).json({ reason: "Database unavailable" });
+            });
+        } else {
+          return req.status(401).json({ reason: "Unauthorized" });
+        }
+      })
+      .catch(err => {
+        console.log(err);
+        return res.status(404).json({ reason: "Database unavailable" });
+      });
+  });
+  
   // @path DELETE /api/memos/memo/
   // @desc Delete memo with specific id
   // @access Private
   // @header <token>
   // @params <id>
-  router.delete("/memo", app.middlewares.loginRedirect, (req, res) => {
+  router.delete("/memo/:id", app.middlewares.loginRedirect, (req, res) => {
     const Memo = app.model.memo;
     const User = app.model.user;
-    const memoId = req.body.id;
+    const memoId = req.params.id;
 
     if (isEmpty(memoId)) {
       return res.status(400).json({ id: "No memo id given" });

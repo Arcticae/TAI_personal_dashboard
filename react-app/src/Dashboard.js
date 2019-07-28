@@ -2,15 +2,40 @@ import React, { Component } from 'react';
 import Memo from "./DashboardElements/Memo.js"
 import { Button } from '@material-ui/core';
 import uuid from "./uuid.js"
-
+import api from "./API.js"
 
 class Dashboard extends Component{
 
     state = {
         memos: []
     }
-    componentDidMount() {
-        // TODO fetch memos
+
+    componentWillMount = () => {
+        api.fetch(api.endpoints.fetchMemos(localStorage.getItem('token')),
+        (response) => {
+            console.log(response);
+            let result = []
+            if(response.length > 0)
+                response.forEach((memo) => {
+                    console.log(memo);
+                    api.fetch(api.endpoints.getMemo(localStorage.getItem('token'), memo._id),
+                    (res) => {
+                        console.log(res);
+                        if('content' in res){
+                            result.push({
+                                id: uuid(),
+                                _id: res._id,
+                                text: res.content,
+                                edit: false,
+                                isAdded: true
+                            })
+                        }
+                    })
+                }
+        )
+        console.log(result);
+        this.setState({memos: result});
+        })
     }
 
     handleDelete = (id) => {
@@ -19,7 +44,7 @@ class Dashboard extends Component{
     }
 
     handleAdd = () => {
-        const memos = [{id: uuid(), text: '', edit: true}].concat(this.state.memos);
+        const memos = [{id: uuid(), _id: '', text: '', edit: true, isAdded: false}].concat(this.state.memos);
         this.setState({memos});
     }
 
@@ -35,9 +60,11 @@ class Dashboard extends Component{
                     {this.state.memos.map(memo => <Memo
                         key={memo.id}
                         id={memo.id}
+                        _id={memo._id}
                         text={memo.text}
                         onDelete={this.handleDelete}
                         edit={memo.edit}
+                        isAdded={memo.isAdded}
                         />)}
                 </div>
                 : <p> You have no memos. </p>

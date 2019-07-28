@@ -42,7 +42,12 @@ const signedIn = () => {
     return token !== null && token.length > 0;
 }
 
+
 class SignIn extends Component{
+
+    componentWillMount() {
+        localStorage.removeItem('token');
+      }
 
     state = {
         username: "",
@@ -66,7 +71,6 @@ class SignIn extends Component{
         api.fetch(
             api.endpoints.signIn({email: this.state.username, password: this.state.password}),
             (response) => {
-                console.log(response);
                 if('token' in response){
                     localStorage.setItem('token', response.token);
                     localStorage.setItem('user', this.state.username);

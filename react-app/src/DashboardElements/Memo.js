@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {withStyles} from '@material-ui/core/styles/index';
 import { Button, TextField } from '@material-ui/core';
 import './memo.css'
+import api from '../API.js'
 
 const styles = (theme) => ({
     memo: {
@@ -22,9 +23,12 @@ const styles = (theme) => ({
 
 class Memo extends Component {
     state = {
+        id: this.props.id,  // internal ID, for React and header
+        _id: this.props._id,            // ID from server
         text: this.props.text,
         edit: this.props.edit,
-        confirmDelete: false
+        confirmDelete: false,
+        isAdded: this.props.isAdded
     };
 
     handleEdit = () => {
@@ -32,13 +36,34 @@ class Memo extends Component {
     }
 
     handleSave = () => {
-        // todo post
-        this.setState({edit: false});
+        if(!this.state.isAdded){
+            api.fetch(
+                api.endpoints.addMemo(localStorage.getItem('token'), {
+                    content: this.state.text,
+                    header: this.state.id   // designed it differently, so I am passing memo's ID
+                }),
+                (response) => {
+                    console.log(response);
+                    if('_id' in response){
+                        console.log(response._id);
+                        this.setState({_id: response._id});
+                    }
+                }
+            )
+        }
+        this.setState({edit: false, isAdded: true}); // there is no put method :(
     }
 
     handleDelete = () => {this.setState({confirmDelete: true});}
     handleCancelDelete = () => {this.setState({confirmDelete: false});}
-    handleConfirmDelete = () => {console.log(this.props.id); this.props.onDelete(this.props.id);}
+    handleConfirmDelete = () => {
+        const {_id, isAdded} = this.state;
+        if(isAdded){
+            api.fetchNoContent(
+                api.endpoints.deleteMemo(localStorage.getItem('token'), _id))
+        }
+        this.props.onDelete(this.props.id);
+    }
 
     handleChange = event => {
         this.setState({text: event.currentTarget.value})
@@ -46,7 +71,7 @@ class Memo extends Component {
 
     render() {
         const {classes} = this.props;
-        const {text, edit, confirmDelete} = this.state;
+        const {text, edit, confirmDelete, isAdded} = this.state;
 
         return (
             <div className={classes.memo}>
@@ -80,7 +105,7 @@ class Memo extends Component {
                     </div>
                     }
                     
-                    <TextField multiline
+                    <TextField multiline disabled={isAdded}
                         className={classes.editmemo}
                         rowsMax="10"
                         value={text}

@@ -38,10 +38,6 @@ const InnerRouter = (props) => {
 
 class App extends Component{
 
-  componentWillMount() {
-    localStorage.removeItem('token');
-  }
-
   render() {
 
       return (

@@ -27,8 +27,7 @@ class NavBar extends Component{
       api.fetchNoContent(
         api.endpoints.signOut({
           token: localStorage.getItem('token')
-        }),
-      (response) => {});
+        }));
 
       localStorage.removeItem('token');
       this.props.history.push('/sign-in');

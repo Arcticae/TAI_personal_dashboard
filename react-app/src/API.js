@@ -19,7 +19,7 @@ export default {
             });
     },
 
-    fetchNoContent: (opt, action) => {
+    fetchNoContent: (opt) => {
         fetch(opt.path, {
             method: opt.method,
             body: opt.body,
@@ -27,7 +27,7 @@ export default {
             // credentials: 'include'
         })
             .then(response => {
-            action(response);
+            console.log(response);
         });
     },
 
@@ -96,23 +96,21 @@ export default {
         }),
 
         getMemo: (token, id) => ({
-            path: url(`memos/memo`),
+            path: url(`memos/memo/${id}`),
             method: "GET",
             headers: {
                 "Content-Type": 'application/json',
                 "token": token
-            },
-            body: id
+            }
         }),
 
         deleteMemo: (token, id) => ({
-            path: url(`memos/memo`),
+            path: url(`memos/memo/${id}`),
             method: "DELETE",
             headers: {
                 "Content-Type": 'application/json',
                 "token": token
-            },
-            body: id
+            }
         }),
 
         fetchMemos: (token) => ({
