@@ -147,12 +147,12 @@ module.exports = app => {
   // @desc Get todolist's content
   // @access Private
   // @header <token>
-  // @body <id>
-  router.get("/todolist", app.middlewares.loginRedirect, (req, res) => {
+
+  router.get("/todolist/:id", app.middlewares.loginRedirect, (req, res) => {
     const User = app.model.user;
     const ToDoList = app.model.todolist;
 
-    const { id } = req.body;
+    const { id } = req.params;
     const errors = {};
     if (isEmpty(id)) {
       errors.id = "id field is required";

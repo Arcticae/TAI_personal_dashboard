@@ -61,15 +61,15 @@ module.exports = app => {
         });
     }
   );
-  // @path GET /api/memos/memo/
+  // @path GET /api/memos/memo/:memoId
   // @desc Get memo with specific id
   // @access Private
   // @header <token>
   // @params <id>
-  router.get("/memo/", app.middlewares.loginRedirect, (req, res) => {
+  router.get("/memo/:memoId", app.middlewares.loginRedirect, (req, res) => {
     const Memo = app.model.memo;
     const User = app.model.user;
-    const memoId = req.body.id;
+    const memoId = req.params.memoId;
 
     if (isEmpty(memoId)) {
       return res.status(400).json({ id: "No memo id given" });

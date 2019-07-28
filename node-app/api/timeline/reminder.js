@@ -98,15 +98,14 @@ module.exports = app => {
         return res.status(404).json({ reason: "Database error" });
       });
   });
-  // @path GET /api/timeline/event/reminder
+  // @path GET /api/timeline/event/reminder/
   // @desc Get all event's reminders
   // @access Private
   // @header <token>
-  // @body <id>
-  router.get("/event/reminder", app.middlewares.loginRedirect, (req, res) => {
+  router.get("/event/reminder/:eventId", app.middlewares.loginRedirect, (req, res) => {
     const Event = app.model.event;
     const User = app.model.user;
-    const eventId = req.body.id;
+    const { eventId } = req.params;
 
     if (isEmpty(eventId)) {
       return res.status(400).json({ id: "No event id given" });
