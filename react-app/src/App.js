@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
-import { Route, Switch, Redirect, BrowserRouter } from 'react-router-dom';
+import { Route, Switch, Redirect } from 'react-router-dom';
 import Dashboard from "./Dashboard.js";
 import SignIn from "./SignIn.js";
 import NavBar from "./NavBar.js";
+import ProtectedRoute from "./ProtectedRoute.js";
 
 function signedIn() {
-    return false;    // TODO unmock
+    const token = localStorage.getItem('token');
+    return token !== null && token.length > 0;
 }
 
 const RootRouter = () => {
@@ -23,9 +25,10 @@ const RootRouter = () => {
 const InnerRouter = (props) => {
   return (
       <div>
+        <NavBar history={props.history}/>
         <Switch>
           <Route exact strict path='/' component={RootRouter} />
-          <Route exact strict path='/dashboard' component={Dashboard}/>
+          <ProtectedRoute exact strict path='/dashboard' component={Dashboard}/>
           <Route exact strict path='*' render={() => "404 Page not found"}/>
         </Switch>
       </div>
@@ -35,13 +38,14 @@ const InnerRouter = (props) => {
 
 class App extends Component{
 
-  render() {
+  componentWillMount() {
+    localStorage.removeItem('token');
+  }
 
-      console.log()
+  render() {
 
       return (
           <div>
-              <NavBar />
               <Switch>
                   <Route exact strict path='/sign-in' component={SignIn}/>
                   <Route strict path='/' component={InnerRouter}/>

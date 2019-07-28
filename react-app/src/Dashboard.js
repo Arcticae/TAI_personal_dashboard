@@ -13,8 +13,6 @@ class Dashboard extends Component{
         // TODO fetch memos
     }
 
-    signedIn = () => {return true;} // todo unmock
-
     handleDelete = (id) => {
         const memos = this.state.memos.filter(m => m.id !== id);
         this.setState({memos});
@@ -23,40 +21,27 @@ class Dashboard extends Component{
     handleAdd = () => {
         const memos = [{id: uuid(), text: '', edit: true}].concat(this.state.memos);
         this.setState({memos});
-        console.log(this.state.memos);
     }
 
     render() {
         return (
-            <div>
-            {this.signedIn()
+            <div style={{marginLeft: 10}}>
+                <Button variant="contained" onClick={this.handleAdd} style={{marginTop: 10}}>
+                    ADD
+                </Button>
+                {this.state.memos.length > 0
                 ?
                 <div>
-                    <Button onClick={this.handleAdd}>
-                        ADD
-                    </Button>
-                    {this.state.memos.length > 0
-                    ?
-                    <div>
-                        {this.state.memos.map(memo => <Memo
-                            key={memo.id}
-                            id={memo.id}
-                            text={memo.text}
-                            onDelete={this.handleDelete}
-                            edit={memo.edit}
-                            />)}
-                    </div>
-                    :
-                    <p style={{marginLeft: 10}}>
-                        You have no memos.
-                    </p>
-                    } 
+                    {this.state.memos.map(memo => <Memo
+                        key={memo.id}
+                        id={memo.id}
+                        text={memo.text}
+                        onDelete={this.handleDelete}
+                        edit={memo.edit}
+                        />)}
                 </div>
-                :
-                <p style={{marginLeft: 10}}>
-                    Please sign in to access memos.
-                </p>
-            }
+                : <p> You have no memos. </p>
+                } 
             </div>
         );
     }

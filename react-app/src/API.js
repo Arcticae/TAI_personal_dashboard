@@ -6,6 +6,7 @@ const url = endpoint => `http://${host}:${port}/api/${endpoint}`;
 export default {
 
     fetch: (opt, action) => {
+        console.log(opt);
         fetch(opt.path, {
             method: opt.method,
             body: opt.body,
@@ -53,14 +54,14 @@ export default {
             path: url(`user/register`),
             method: "POST",
             body: JSON.stringify(data),
-            headers: {'Content-Type': 'application/json'}
+            headers: {"Content-Type": 'application/json'}
         }),
 
         signIn: (data) => ({
             path: url(`user/login`),
             method: "POST",
             body: JSON.stringify(data),
-            headers: {'Content-Type': 'application/json'}
+            headers: {"Content-Type": 'application/json'}
         }),
 
         getUserData: (token) => ({
@@ -77,9 +78,9 @@ export default {
             method: "POST",
             headers: {
                 "Content-Type": 'application/json',
-                "token": token
+                "token": token.token
             },
-            body: token
+            body: JSON.stringify(token)
         }),
 
 //      ====== MEMOS =======================================

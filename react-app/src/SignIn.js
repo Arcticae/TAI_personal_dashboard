@@ -8,6 +8,7 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import api from './API';
 
+
 const styles = theme => ({
     main: {
         width: 'auto',
@@ -36,7 +37,10 @@ const styles = theme => ({
     },
 });
 
-const signedIn = () => false;
+const signedIn = () => {
+    const token = localStorage.getItem('token');
+    return token !== null && token.length > 0;
+}
 
 class SignIn extends Component{
 
@@ -47,21 +51,7 @@ class SignIn extends Component{
     };
 
     handleLoginError = () => {
-        this.state.error = true;
-    }
-
-    fetchUserAndRedirect(token){
-        api.fetchHandleError(
-            api.endpoints.getUserData(token),
-            (response) => {
-                const user = {
-                    userId: response.id,
-                    token: token
-                };
-                localStorage.setItem('user', JSON.stringify(user));
-                // todo this.redirectAfterLogin();
-            },
-            this.handleLoginError.bind(this));
+        this.setState({error: true});
     }
 
     handleChange = event => {
@@ -71,30 +61,29 @@ class SignIn extends Component{
     };
 
     submit = () => {
-        this.state.error = false;
+        this.setState({error: false});
         console.log(`Signing in with ${this.state.username}:${this.state.password}`);
-        api.fetchHandleError(
+        api.fetch(
             api.endpoints.signIn({email: this.state.username, password: this.state.password}),
             (response) => {
                 console.log(response);
-                // todo retrieve token from response
-                // this.fetchUserAndRedirect(response)
-            },
-            this.handleLoginError.bind(this)
+                if('token' in response){
+                    localStorage.setItem('token', response.token);
+                    localStorage.setItem('user', this.state.username);
+                    this.props.history.push("/dashboard");
+                }
+            }
         )
     };
 
     register = () => {
-        const {name, password} = this.state;
-
-        const data = {
-            username: name,
-            password: password,
-            email: name
-        };
         console.log(`Registering with ${this.state.username}:${this.state.password}`);
         api.fetch(
-            api.endpoints.register(data),
+            api.endpoints.register({
+                email: this.state.username,
+                password: this.state.password,
+                username: this.state.username
+            }),
             (user) => {
                 this.setState({
                     name: '',
