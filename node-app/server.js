@@ -1,9 +1,12 @@
 const express = require("express");
 const app = express();
+const cors = require("cors");
 // const morgan = require("morgan");
 app.mongoose = require("mongoose");
 
 app.use(express.json({ extended: true })); // to support JSON-encoded bodies
+app.use(cors());
+app.use(require("body-parser").json());
 // app.use(morgan("dev"));
 
 const NODE_ENV = process.env.NODE_ENV.trim() || "dev"; // ten trim jest po chuj
