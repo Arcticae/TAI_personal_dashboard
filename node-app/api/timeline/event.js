@@ -66,11 +66,10 @@ module.exports = app => {
   // @desc Get event with specific id
   // @access Private
   // @header <token>
-  // @body <id>
-  router.get("/event", app.middlewares.loginRedirect, (req, res) => {
+  router.get("/event/:eventId", app.middlewares.loginRedirect, (req, res) => {
     const Event = app.model.event;
     const User = app.model.user;
-    const eventId = req.body.id;
+    const eventId = req.params.eventId;
 
     if (isEmpty(eventId)) {
       return res.status(400).json({ id: "No event id given" });
@@ -162,7 +161,7 @@ module.exports = app => {
                     _id: reminder_id,
                     owner: user._id
                   })
-                    .then(_ => {})
+                    .then(_ => { })
                     .catch(err => {
                       console.log(err);
                       return res
