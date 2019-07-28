@@ -172,6 +172,30 @@ export default {
                 "Content-Type": 'application/json',
                 "token": token
             },
+        }),
+
+//       ====== GOOGLE =======================================
+
+        googleGetLink: () => ({
+            path: url(`googleCalendar/auth`),
+            method: "GET",
+            headers: {}
+        }),
+
+
+  // @path POST /api/googleCalendar/auth
+  // @desc Post code to authorize this app to use user's calendars
+  // @access Private
+  // @header <token>
+  // @body <accessCode>
+        googleAuthorize: (token, code) => ({
+            path: url(`googleCalendar/auth`),
+            method: "POST",
+            headers: {
+                "Content-Type": 'application/json',
+                "token": token
+            },
+            body: code
         })
     }
 }

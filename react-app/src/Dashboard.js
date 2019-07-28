@@ -7,10 +7,18 @@ import api from "./API.js"
 class Dashboard extends Component{
 
     state = {
-        memos: []
+        memos: [],
+        googleLink: "",
+        googleStarted: false,
+        googleCode: ""
     }
 
-    componentWillMount = () => {
+    componentDidMount = () => {
+        api.fetch(api.endpoints.googleGetLink(),
+        (response) => {
+            console.log(response);
+            this.setState({googleLink: response.link});
+        })
         api.fetch(api.endpoints.fetchMemos(localStorage.getItem('token')),
         (response) => {
             console.log(response);
@@ -38,6 +46,12 @@ class Dashboard extends Component{
         })
     }
 
+    handleChange = event => {
+        this.setState({
+            [event.target.id]: event.target.value
+        });
+    };
+    
     handleDelete = (id) => {
         const memos = this.state.memos.filter(m => m.id !== id);
         this.setState({memos});
@@ -48,12 +62,39 @@ class Dashboard extends Component{
         this.setState({memos});
     }
 
+    googleStart = () => {
+        this.setState({googleStarted: true});
+        var win = window.open(this.state.googleLink, '_blank');
+        win.focus();
+    }
+
+    googleConnect = () => {
+        api.fetch(api.endpoints.googleAuthorize(localStorage.getItem('token'), {accessCode: this.state.googleCode}),
+        (response) => {
+            console.log(response);
+        })
+    }
+
     render() {
         return (
-            <div style={{marginLeft: 10}}>
+            <div style={{marginLeft: 10, marginTop: 10}}>
                 <Button variant="contained" onClick={this.handleAdd} style={{marginTop: 10}}>
                     ADD
                 </Button>
+                <div>
+                {this.state.googleStarted?
+                <div>
+                    <input id="googleCode" placeholder="Paste code here" value={this.state.googleCode} onChange={this.handleChange} />
+                    <Button variant="contained" onClick={this.googleConnect}>
+                        BOOM
+                    </Button></div>
+                :
+                    <Button variant="contained" onClick={this.googleStart}>
+                        CONNECT WITH GOOGLE
+                    </Button>
+                }
+                </div>
+                
                 {this.state.memos.length > 0
                 ?
                 <div>
