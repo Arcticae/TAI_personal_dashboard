@@ -34,5 +34,6 @@
   ],
   "devDependencies": {
     "cypress": "^3.4.1"
-  }
+  },
+  "proxy" : "https://glacial-ridge-84279.herokuapp.com"
 }

@@ -73,6 +73,7 @@ class Dashboard extends Component{
         api.fetchNoContent(api.endpoints.googleAuthorize(localStorage.getItem('token'), {accessCode: this.state.googleCode}))
     }
 
+    
     render() {
         return (
             <div style={{marginLeft: 10}}>

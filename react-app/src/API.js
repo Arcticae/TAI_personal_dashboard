@@ -1,6 +1,6 @@
-const host = "localhost";
+const host = "https://glacial-ridge-84279.herokuapp.com/";
 const port = 6969;
-const url = endpoint => `http://${host}:${port}/api/${endpoint}`;
+const url = endpoint => `${host}:${port}/api/${endpoint}`;
 //'content-type': 'application/json'
 
 export default {
