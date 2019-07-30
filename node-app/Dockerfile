@@ -1,12 +1,14 @@
 FROM mhart/alpine-node:8.11.4
 
-WORKDIR /node-app
+RUN mkdir -p /usr/src/app
 
-COPY package*.json /node-app/
+WORKDIR /usr/src/app
 
-RUN npm install -g npm@5.6.0 && npm install
+COPY . .
 
-COPY . /node-app/
+COPY package*.json ./
+
+RUN npm install -g npm && npm install && npm ls
 
 EXPOSE 6969
 

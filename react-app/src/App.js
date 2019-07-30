@@ -1,33 +1,53 @@
 import React, { Component } from 'react';
-import { Page, Button, Textarea, Panel } from 'react-blur-admin';
+import { Route, Switch, Redirect } from 'react-router-dom';
+import Dashboard from "./Dashboard.js";
+import SignIn from "./SignIn.js";
+import NavBar from "./NavBar.js";
+import ProtectedRoute from "./ProtectedRoute.js";
 
-class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      textareaCount: 1
-    };
-  }
+function signedIn() {
+    const token = localStorage.getItem('token');
+    return token !== null && token.length > 0;
+}
 
-  onTextChange(key, event) {
-    this.setState({ [key]: event.currentTarget.value });
-  }
+const RootRouter = () => {
+  return (
+      <Route
+          render={() => (
+              signedIn()
+                  ? <Redirect to={{pathname: "/dashboard"}}/>
+                  : <Redirect to={{pathname: "/sign-in"}}/>
+          )}
+      />
+  );
+}
+
+const InnerRouter = (props) => {
+  return (
+      <div>
+        <NavBar history={props.history}/>
+        <Switch>
+          <Route exact strict path='/' component={RootRouter} />
+          <ProtectedRoute exact strict path='/dashboard' component={Dashboard}/>
+          <Route exact strict path='*' render={() => (<p>404 Page not found</p>)}/>
+        </Switch>
+      </div>
+  );
+};
+
+
+class App extends Component{
 
   render() {
 
-    return (
-      <Page>
-        <Button type='add' on/>
-        <Panel title={`Textarea No.${this.state.textareaCount}`}>
-          <Textarea
-            name='textarea'
-            placeholder='Default Input'
-            label={<Button type='remove' />}
-            onChange={e => this.onTextChange('textarea', e)}
-            value={this.state.textarea} />
-        </Panel>
-      </Page>
-    );
+      return (
+          <div>
+              <Switch>
+                  <Route exact strict path='/sign-in' component={SignIn}/>
+                  <Route strict path='/' component={InnerRouter}/>
+              </Switch>
+          </div>
+      );
   }
 }
 

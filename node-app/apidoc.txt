@@ -10,7 +10,7 @@
   // @desc Get memo with specific id
   // @access Private
   // @header <token>
-  // @body <id>
+  // @params <id>
 
   // @path GET /api/memos/memo/all
   // @desc Get all memo's id's and headers
