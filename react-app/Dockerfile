@@ -1,13 +1,14 @@
 FROM mhart/alpine-node:8.11.4
+ 
+RUN mkdir -p /usr/src/app
+ 
+WORKDIR /usr/src/app
+ 
+COPY . .
+ 
+COPY package*.json ./
 
-WORKDIR /react-app
-
-COPY package*.json /react-app/
-
-RUN npm install -g npm@5.6.0
-
-COPY . /react-app/
-
-EXPOSE 3000
-
-CMD [ "npm", "start" ]
+RUN npm install -g npm && npm install && npm ls
+ 
+EXPOSE 6969
+ 
