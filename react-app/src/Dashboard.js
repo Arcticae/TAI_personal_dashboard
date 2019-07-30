@@ -69,16 +69,14 @@ class Dashboard extends Component{
     }
 
     googleConnect = () => {
-        api.fetch(api.endpoints.googleAuthorize(localStorage.getItem('token'), {accessCode: this.state.googleCode}),
-        (response) => {
-            console.log(response);
-        })
+        console.log(localStorage.getItem('token'));
+        api.fetchNoContent(api.endpoints.googleAuthorize(localStorage.getItem('token'), {accessCode: this.state.googleCode}))
     }
 
     render() {
         return (
-            <div style={{marginLeft: 10, marginTop: 10}}>
-                <Button variant="contained" onClick={this.handleAdd} style={{marginTop: 10}}>
+            <div style={{marginLeft: 10}}>
+                <Button variant="contained" onClick={this.handleAdd} style={{marginTop: 10}} data-cy="add">
                     ADD
                 </Button>
                 <div>

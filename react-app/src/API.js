@@ -31,21 +31,6 @@ export default {
         });
     },
 
-    fetchHandleError: (opt, action, errorCallback) => {
-        console.log(opt);
-        fetch(opt.path, {
-            method: opt.method,
-            body: opt.body,
-            headers: opt.headers,
-            // credentials: 'include'
-        })
-            .then(res => res.json())
-            .then(response => {
-                action(response);
-            })
-            .catch(errorCallback);
-    },
-
     endpoints: {
 
 //      ====== USER ========================================
