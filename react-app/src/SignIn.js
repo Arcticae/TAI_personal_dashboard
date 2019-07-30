@@ -53,10 +53,10 @@ class SignIn extends Component{
         username: "",
         password: "",
         error: false,
+        registerError: false
     };
 
     handleLoginError = () => {
-        this.setState({error: true});
     }
 
     handleChange = event => {
@@ -66,7 +66,7 @@ class SignIn extends Component{
     };
 
     submit = () => {
-        this.setState({error: false});
+        this.setState({error: false, registerError: false});
         console.log(`Signing in with ${this.state.username}:${this.state.password}`);
         api.fetch(
             api.endpoints.signIn({email: this.state.username, password: this.state.password}),
@@ -75,12 +75,15 @@ class SignIn extends Component{
                     localStorage.setItem('token', response.token);
                     localStorage.setItem('user', this.state.username);
                     this.props.history.push("/dashboard");
+                } else {
+                    this.setState({error: true});
                 }
             }
         )
     };
 
     register = () => {
+        this.setState({error: false, registerError: false});
         console.log(`Registering with ${this.state.username}:${this.state.password}`);
         api.fetch(
             api.endpoints.register({
@@ -88,18 +91,19 @@ class SignIn extends Component{
                 password: this.state.password,
                 username: this.state.username
             }),
-            (user) => {
-                this.setState({
-                    name: '',
-                    password: ''
-                })
+            (response) => {
+                this.setState({ name: '', password: '' });
+                console.log(response);
+                if(response.email === 'User with that e-mail address already exists'){
+                    this.setState({registerError: true});
+                }
             }
         );
     };
 
     render() {
         const {classes} = this.props;
-        const {error} = this.state;
+        const {error, registerError} = this.state;
 
         if(signedIn())
             return (<Redirect to={{pathname: "/dashboard"}}/>);
@@ -111,7 +115,10 @@ class SignIn extends Component{
                         Sign in
                     </Typography>
                     {error &&
-                    <Typography color="secondary">Incorrect mail or password</Typography>
+                    <Typography color="secondary" data-cy="err">Incorrect mail or password</Typography>
+                    }
+                    {registerError &&
+                    <Typography color="secondary" data-cy="regerr">This user already exists</Typography>
                     }
                     <br /><br/>
                     <form onSubmit={this.submit}>
@@ -125,10 +132,10 @@ class SignIn extends Component{
                                 Password: <input id="password" type="password" value={this.state.password} onChange={this.handleChange} />
                             </Typography>
                         </label><br />
-                        <Button fullWidth variant="contained" color="primary" className={classes.submit} onClick={this.submit}>
+                        <Button fullWidth variant="contained" color="primary" className={classes.submit} onClick={this.submit} data-cy="submit">
                             Sign in
                         </Button>
-                        <Button fullWidth variant="outlined" color="primary" className={classes.submit} onClick={this.register}>
+                        <Button fullWidth variant="outlined" color="primary" className={classes.submit} onClick={this.register} data-cy="register">
                             Register
                         </Button>
                     </form>

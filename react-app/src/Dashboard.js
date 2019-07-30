@@ -51,7 +51,7 @@ class Dashboard extends Component{
     render() {
         return (
             <div style={{marginLeft: 10}}>
-                <Button variant="contained" onClick={this.handleAdd} style={{marginTop: 10}}>
+                <Button variant="contained" onClick={this.handleAdd} style={{marginTop: 10}} data-cy="add">
                     ADD
                 </Button>
                 {this.state.memos.length > 0

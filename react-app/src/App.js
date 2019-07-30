@@ -29,7 +29,7 @@ const InnerRouter = (props) => {
         <Switch>
           <Route exact strict path='/' component={RootRouter} />
           <ProtectedRoute exact strict path='/dashboard' component={Dashboard}/>
-          <Route exact strict path='*' render={() => "404 Page not found"}/>
+          <Route exact strict path='*' render={() => (<p>404 Page not found</p>)}/>
         </Switch>
       </div>
   );

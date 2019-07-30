@@ -5,6 +5,7 @@
   "dependencies": {
     "core-js": "^3.1.4",
     "classnames": "^2.2.5",
+    "cypress": "^3.4.1",
     "@material-ui/core": "^3.9.3",
     "prop-types": "^15.7.2",
     "react": "^16.8.6",
@@ -20,7 +21,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "cypress": "cypress open"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -30,5 +32,8 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "devDependencies": {
+    "cypress": "^3.4.1"
+  }
 }

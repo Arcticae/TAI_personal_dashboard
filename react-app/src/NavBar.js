@@ -22,7 +22,7 @@ class NavBar extends Component{
       return token !== null && token.length > 0;
     }
 
-    handleSignIn = () => {}
+    handleSignIn = () => {this.props.history.push('/sign-in');}
     handleSignOut = () => {
       api.fetchNoContent(
         api.endpoints.signOut({
@@ -41,11 +41,11 @@ class NavBar extends Component{
        <AppBar position="static">
          <Toolbar>
            <Typography color="inherit" variant="h6" className={classes.title}>
-             {`${localStorage.getItem('user')}'s Personal Dashboard`}
+             {`${localStorage.getItem('user') !== null ? localStorage.getItem('user')+"'s": ""} Personal Dashboard`}
            </Typography>
            {this.signedIn()
-            ? <Button color="inherit" onClick={this.handleSignOut}>Sign out</Button>
-            : <Button color="inherit" onClick={this.handleSignIn}>Sign in</Button>
+            ? <Button color="inherit" onClick={this.handleSignOut} data-cy="signout">Sign out</Button>
+            : <Button color="inherit" onClick={this.handleSignIn} data-cy="signin">Sign in</Button>
            }
          </Toolbar>
        </AppBar>

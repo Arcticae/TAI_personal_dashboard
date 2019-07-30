@@ -87,19 +87,19 @@ class Memo extends Component {
                         <Button size="small" color="secondary">
                             DELETE?
                         </Button>
-                        <Button size="small" color="secondary"  variant="outlined" onClick={this.handleConfirmDelete}>
+                        <Button size="small" color="secondary"  variant="outlined" onClick={this.handleConfirmDelete} data-cy="confirm">
                             CONFIRM
                         </Button>
-                        <Button size="small"  variant="outlined" onClick={this.handleCancelDelete}>
+                        <Button size="small"  variant="outlined" onClick={this.handleCancelDelete} data-cy="cancel">
                             CANCEL
                         </Button>
                     </div>
                     :
                     <div className={classes.saveRow}>
-                        <Button size="small" color="primary" variant="outlined" onClick={this.handleSave}>
+                        <Button size="small" color="primary" variant="outlined" onClick={this.handleSave} data-cy="save">
                             SAVE
                         </Button>
-                        <Button size="small" color="secondary" variant="outlined" onClick={this.handleDelete}>
+                        <Button size="small" color="secondary" variant="outlined" onClick={this.handleDelete} data-cy="delete">
                             DELETE
                         </Button>
                     </div>
@@ -116,10 +116,10 @@ class Memo extends Component {
                 </div>
                 :
                 <div>
-                    <Button size="small" color="primary" variant="outlined" onClick={this.handleEdit}>
+                    <Button size="small" color="primary" variant="outlined" onClick={this.handleEdit} data-cy="edit">
                         EDIT
                     </Button><br />
-                    <TextField multiline disabled
+                    <TextField multiline disabled 
                         className={"frozenmemo"}
                         rowsMax="10"
                         value={text}

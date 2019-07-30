@@ -8,7 +8,8 @@ COPY . .
  
 COPY package*.json ./
 
-RUN npm install -g npm && npm install && npm ls
+RUN npm install -g npm && npm install
  
 EXPOSE 6969
  
+CMD [ "npm", "start" ]
