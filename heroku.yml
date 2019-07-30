@@ -2,4 +2,3 @@ build:
   docker:
     frontend: react-app/Dockerfile.reactapp
     backend: node-app/Dockerfile.nodeapp
-    mongo: Dockerfile.mongo
