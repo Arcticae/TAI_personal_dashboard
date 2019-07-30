@@ -7,10 +7,9 @@ app.use(express.json({ extended: true })); // to support JSON-encoded bodies
 // app.use(morgan("dev"));
 
 const NODE_ENV = process.env.NODE_ENV.trim() || "dev"; // ten trim jest po chuj
+const { MONGO_PASSWD } = process.env
 const config = {
-  mongoDBPath: `mongodb://${
-    NODE_ENV === "dev" ? "localhost" : "mongodb"
-  }:27017/node-app-db`,
+  mongoDBPath: `mongodb://personal_dashboard_tai:kreatywnehaslo123@ds147265.mlab.com:47265/heroku_zqj4r0x0`,
   SESS_TIMEOUT: 10,
   APP_PORT: 6969,
   dbConnectionOptions: {
