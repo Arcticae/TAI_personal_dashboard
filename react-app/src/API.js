@@ -167,12 +167,6 @@ export default {
             headers: {}
         }),
 
-
-  // @path POST /api/googleCalendar/auth
-  // @desc Post code to authorize this app to use user's calendars
-  // @access Private
-  // @header <token>
-  // @body <accessCode>
         googleAuthorize: (token, code) => ({
             path: url(`googleCalendar/auth`),
             method: "POST",
@@ -181,6 +175,16 @@ export default {
                 "token": token
             },
             body: code
-        })
+        }),
+
+        // Response: [{ header: <String> , date: <Date> , reminders: [ <Date> ] }]
+        googleFetchEvents: (token) => ({
+            path: url(`googleCalendar/event`),
+            method: "GET",
+            headers: {
+                "Content-Type": 'application/json',
+                "token": token
+            }
+        }),
     }
 }
