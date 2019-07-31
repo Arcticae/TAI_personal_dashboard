@@ -17,7 +17,7 @@ const styles = (theme) => ({
         color: 'black'
     },
     editmemo: {
-        width: '33%'
+        width: '66%'
     }
 });
 
