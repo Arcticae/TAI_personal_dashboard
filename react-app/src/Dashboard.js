@@ -102,7 +102,7 @@ class Dashboard extends Component{
                         ADD MEMO
                     </Button>
                     
-                    {this.state.events.length > 0
+                    {this.state.memos.length > 0
                     ?
                     <div>
                         {this.state.memos.map(memo => <Memo
@@ -120,6 +120,7 @@ class Dashboard extends Component{
                 </div>
                 </Grid>
                 <Grid item xs={6}>
+                    <div style={{marginTop: 10}}>
                     {this.state.googleStarted?
                     <div>
                         <input id="googleCode" placeholder="Paste code here" value={this.state.googleCode} onChange={this.handleChange} />
@@ -131,7 +132,7 @@ class Dashboard extends Component{
                             CONNECT WITH GOOGLE
                         </Button>
                     }
-
+                    </div>
                     {this.state.events.length > 0
                     ?
                     <div>
